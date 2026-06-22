@@ -89,7 +89,7 @@ footer{text-align:center;font-size:11px;color:var(--dim);margin-top:44px;padding
 
 <div id="live-wrap" style="display:none;">
 <h2>⚽ En direct</h2>
-<div class="sec-tag">Matchs en cours — score live, non encore compté au classement</div>
+<div class="sec-tag">Matchs en cours — score live, déjà pris en compte (provisoire ●) dans le classement et la projection</div>
 <div class="mlist" id="live"></div>
 </div>
 
@@ -171,10 +171,16 @@ function apiCode(name){
 // Reconstruit st + matchData à partir des fixtures live (matchs terminés uniquement pour le classement,
 // la phase de groupes). Renvoie {st, matches, live} ou null si données inexploitables.
 function buildFromLive(fixtures){
-  const fresh={}; for(const code in st){ fresh[code]={t:code,g:st[code].g,w:0,d:0,l:0,gf:0,ga:0,pts:0,played:0,h2h:{}}; }
+  const fresh={}; for(const code in st){ fresh[code]={t:code,g:st[code].g,w:0,d:0,l:0,gf:0,ga:0,pts:0,played:0,h2h:{},liveCodes:[]}; }
   const finishedMatches=[];
-  const inPlay=[];           // matchs en cours : {h,a,hs,as,status,group}
+  const inPlay=[];           // matchs en cours : {h,a,hs,as,status}
   let usable=0;
+  function applyMatch(H,A,hs,as,isLive){
+    H.gf+=hs;H.ga+=as;H.played++; A.gf+=as;A.ga+=hs;A.played++;
+    H.h2h[A.t]={gf:hs,ga:as}; A.h2h[H.t]={gf:as,ga:hs};
+    if(hs>as){H.w++;H.pts+=3;A.l++;} else if(hs<as){A.w++;A.pts+=3;H.l++;} else {H.d++;A.d++;H.pts++;A.pts++;}
+    if(isLive){ H.liveCodes.push(A.t); A.liveCodes.push(H.t); } // marque que ce résultat est provisoire
+  }
   fixtures.forEach(f=>{
     const isGroup = /group/i.test((f.stage||"")+(f.group||""));
     const hc=tlaCode(f.homeTla)||apiCode(f.home), ac=tlaCode(f.awayTla)||apiCode(f.away);
@@ -183,19 +189,14 @@ function buildFromLive(fixtures){
     const live = f.status==='IN_PLAY' || f.status==='PAUSED';   // PAUSED = mi-temps
     if(done && f.homeGoals!=null && f.awayGoals!=null){
       finishedMatches.push([hc,f.homeGoals,ac,f.awayGoals]);
-      if(isGroup){
-        const H=fresh[hc],A=fresh[ac],hs=f.homeGoals,as=f.awayGoals;
-        H.gf+=hs;H.ga+=as;H.played++; A.gf+=as;A.ga+=hs;A.played++;
-        H.h2h[ac]={gf:hs,ga:as}; A.h2h[hc]={gf:as,ga:hs};
-        if(hs>as){H.w++;H.pts+=3;A.l++;} else if(hs<as){A.w++;A.pts+=3;H.l++;} else {H.d++;A.d++;H.pts++;A.pts++;}
-        usable++;
-      }
+      if(isGroup){ applyMatch(fresh[hc],fresh[ac],f.homeGoals,f.awayGoals,false); usable++; }
     } else if(live){
-      inPlay.push({h:hc,a:ac,hs:(f.homeGoals==null?0:f.homeGoals),as:(f.awayGoals==null?0:f.awayGoals),status:f.status});
+      const hs=(f.homeGoals==null?0:f.homeGoals), as=(f.awayGoals==null?0:f.awayGoals);
+      inPlay.push({h:hc,a:ac,hs,as,status:f.status});
+      // ► Les matchs en cours COMPTENT désormais dans le classement (score provisoire)
+      if(isGroup){ applyMatch(fresh[hc],fresh[ac],hs,as,true); usable++; }
     }
   });
-  // Si aucun match fini exploitable MAIS des matchs en cours, on garde quand même les données figées
-  // pour le classement, et on renvoie juste les matchs en cours.
   for(const c in fresh) fresh[c].gd=fresh[c].gf-fresh[c].ga;
   return { st:(usable>=1?fresh:null), matches:(usable>=1?finishedMatches:null), live:inPlay };
 }
@@ -261,7 +262,7 @@ Object.keys(grp).forEach(g=>{grp[g]=fifaOrder(grp[g]);});
 
 // ---- GROUPES ----
 const gc=document.getElementById('groups');
-Object.keys(grp).sort().forEach(g=>{const a=grp[g];const p=a.reduce((s,x)=>s+x.played,0)/2;let rows='';a.forEach((x,i)=>{const q=i<2?'q1':(i===2?'q3':'');const d=(x.gd>0?'+':'')+x.gd;rows+=`<tr class="${q}"><td class="rk">${i+1}</td><td class="l"><span class="tm"><span class="f">${x.flag}</span>${x.name}</span></td><td>${x.played}</td><td>${x.w}</td><td>${x.d}</td><td>${x.l}</td><td>${x.gf}:${x.ga}</td><td class="${x.gd>0?'gdp':'gdn'}">${d}</td><td class="pts">${x.pts}</td></tr>`;});gc.innerHTML+=`<div class="grp"><div class="grp-h"><span>Groupe ${g}</span><span class="gj">${p}/6 matchs</span></div><table><thead><tr><th></th><th class="l">Équipe</th><th>J</th><th>G</th><th>N</th><th>P</th><th>Buts</th><th>Diff</th><th>Pts</th></tr></thead><tbody>${rows}</tbody></table></div>`;});
+Object.keys(grp).sort().forEach(g=>{const a=grp[g];const p=a.reduce((s,x)=>s+x.played,0)/2;let rows='';a.forEach((x,i)=>{const q=i<2?'q1':(i===2?'q3':'');const d=(x.gd>0?'+':'')+x.gd;rows+=`<tr class="${q}"><td class="rk">${i+1}</td><td class="l"><span class="tm"><span class="f">${x.flag}</span>${x.name}${(x.liveCodes&&x.liveCodes.length)?' <span title="résultat en cours, provisoire" style="color:#ff5a5a;font-size:9px;vertical-align:middle;">●</span>':''}</span></td><td>${x.played}</td><td>${x.w}</td><td>${x.d}</td><td>${x.l}</td><td>${x.gf}:${x.ga}</td><td class="${x.gd>0?'gdp':'gdn'}">${d}</td><td class="pts">${x.pts}</td></tr>`;});gc.innerHTML+=`<div class="grp"><div class="grp-h"><span>Groupe ${g}</span><span class="gj">${p}/6 matchs</span></div><table><thead><tr><th></th><th class="l">Équipe</th><th>J</th><th>G</th><th>N</th><th>P</th><th>Buts</th><th>Diff</th><th>Pts</th></tr></thead><tbody>${rows}</tbody></table></div>`;});
 
 // ---- TOP 8 DES 3es ----
 const thirds=[];Object.keys(grp).forEach(g=>{if(grp[g][2])thirds.push({...grp[g][2],gr:g});});
