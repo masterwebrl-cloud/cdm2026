@@ -1,20 +1,9 @@
 [build]
-  command = "npm run build"
   functions = "netlify/functions"
-  publish = "dist"
+  publish = "."
 
-[dev]
-  command = "npm run dev"
-  port = 8888
-
+# Joli chemin : /api/scores -> la fonction
 [[redirects]]
-  from = "/api/*"
-  to = "/.netlify/functions/:splat"
+  from = "/api/scores"
+  to = "/.netlify/functions/scores"
   status = 200
-
-[[headers]]
-  for = "/*"
-  [headers.values]
-    X-Content-Type-Options = "nosniff"
-    X-Frame-Options = "DENY"
-    X-XSS-Protection = "1; mode=block"
