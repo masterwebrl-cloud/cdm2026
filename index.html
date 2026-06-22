@@ -83,7 +83,8 @@ footer{text-align:center;font-size:11px;color:var(--dim);margin-top:44px;padding
 <body>
 <div class="wrap">
 <h1>Coupe du Monde<span class="yr">2026</span></h1>
-<div class="meta">36 matchs joués • Données réelles au 21 juin 2026</div>
+<div class="meta">40 matchs joués • Données réelles au 22 juin 2026</div>
+<div id="live-badge" style="margin-top:8px;font-size:12px;color:var(--dim);">○ Données figées (mise à jour manuelle)</div>
 <div class="sub">Canada · Mexique · États-Unis</div>
 
 <h2>Groupes</h2>
@@ -91,7 +92,7 @@ footer{text-align:center;font-size:11px;color:var(--dim);margin-top:44px;padding
 <div class="groups" id="groups"></div>
 
 <h2>📺 Diffusion du jour</h2>
-<div class="sec-tag">Dimanche 21 juin — heures de Paris (CEST) · diffuseurs France & MENA</div>
+<div class="sec-tag">Lundi 22 juin — heures de Paris (CEST) · diffuseurs France & MENA</div>
 <div class="tv" id="tv"></div>
 
 <h2>Top 8 des 3<sup>es</sup></h2>
@@ -111,8 +112,8 @@ footer{text-align:center;font-size:11px;color:var(--dim);margin-top:44px;padding
 </div>
 
 <script>
-const st = {"MEX":{"t":"MEX","g":"A","w":2,"d":0,"l":0,"gf":3,"ga":0,"pts":6,"played":2,"h2h":{"RSA":{"gf":2,"ga":0},"KOR":{"gf":1,"ga":0}},"gd":3},"KOR":{"t":"KOR","g":"A","w":1,"d":0,"l":1,"gf":2,"ga":2,"pts":3,"played":2,"h2h":{"CZE":{"gf":2,"ga":1},"MEX":{"gf":0,"ga":1}},"gd":0},"CZE":{"t":"CZE","g":"A","w":0,"d":1,"l":1,"gf":2,"ga":3,"pts":1,"played":2,"h2h":{"KOR":{"gf":1,"ga":2},"RSA":{"gf":1,"ga":1}},"gd":-1},"RSA":{"t":"RSA","g":"A","w":0,"d":1,"l":1,"gf":1,"ga":3,"pts":1,"played":2,"h2h":{"MEX":{"gf":0,"ga":2},"CZE":{"gf":1,"ga":1}},"gd":-2},"CAN":{"t":"CAN","g":"B","w":1,"d":1,"l":0,"gf":7,"ga":1,"pts":4,"played":2,"h2h":{"BIH":{"gf":1,"ga":1},"QAT":{"gf":6,"ga":0}},"gd":6},"SUI":{"t":"SUI","g":"B","w":1,"d":1,"l":0,"gf":5,"ga":2,"pts":4,"played":2,"h2h":{"QAT":{"gf":1,"ga":1},"BIH":{"gf":4,"ga":1}},"gd":3},"BIH":{"t":"BIH","g":"B","w":0,"d":1,"l":1,"gf":2,"ga":5,"pts":1,"played":2,"h2h":{"CAN":{"gf":1,"ga":1},"SUI":{"gf":1,"ga":4}},"gd":-3},"QAT":{"t":"QAT","g":"B","w":0,"d":1,"l":1,"gf":1,"ga":7,"pts":1,"played":2,"h2h":{"SUI":{"gf":1,"ga":1},"CAN":{"gf":0,"ga":6}},"gd":-6},"BRA":{"t":"BRA","g":"C","w":1,"d":1,"l":0,"gf":4,"ga":1,"pts":4,"played":2,"h2h":{"MAR":{"gf":1,"ga":1},"HTI":{"gf":3,"ga":0}},"gd":3},"MAR":{"t":"MAR","g":"C","w":1,"d":1,"l":0,"gf":2,"ga":1,"pts":4,"played":2,"h2h":{"BRA":{"gf":1,"ga":1},"SCO":{"gf":1,"ga":0}},"gd":1},"SCO":{"t":"SCO","g":"C","w":1,"d":0,"l":1,"gf":1,"ga":1,"pts":3,"played":2,"h2h":{"HTI":{"gf":1,"ga":0},"MAR":{"gf":0,"ga":1}},"gd":0},"HTI":{"t":"HTI","g":"C","w":0,"d":0,"l":2,"gf":0,"ga":4,"pts":0,"played":2,"h2h":{"SCO":{"gf":0,"ga":1},"BRA":{"gf":0,"ga":3}},"gd":-4},"USA":{"t":"USA","g":"D","w":2,"d":0,"l":0,"gf":6,"ga":1,"pts":6,"played":2,"h2h":{"PAR":{"gf":4,"ga":1},"AUS":{"gf":2,"ga":0}},"gd":5},"AUS":{"t":"AUS","g":"D","w":1,"d":0,"l":1,"gf":2,"ga":2,"pts":3,"played":2,"h2h":{"TUR":{"gf":2,"ga":0},"USA":{"gf":0,"ga":2}},"gd":0},"PAR":{"t":"PAR","g":"D","w":1,"d":0,"l":1,"gf":2,"ga":4,"pts":3,"played":2,"h2h":{"USA":{"gf":1,"ga":4},"TUR":{"gf":1,"ga":0}},"gd":-2},"TUR":{"t":"TUR","g":"D","w":0,"d":0,"l":2,"gf":0,"ga":3,"pts":0,"played":2,"h2h":{"AUS":{"gf":0,"ga":2},"PAR":{"gf":0,"ga":1}},"gd":-3},"GER":{"t":"GER","g":"E","w":2,"d":0,"l":0,"gf":9,"ga":2,"pts":6,"played":2,"h2h":{"CUW":{"gf":7,"ga":1},"CIV":{"gf":2,"ga":1}},"gd":7},"CIV":{"t":"CIV","g":"E","w":1,"d":0,"l":1,"gf":2,"ga":2,"pts":3,"played":2,"h2h":{"ECU":{"gf":1,"ga":0},"GER":{"gf":1,"ga":2}},"gd":0},"ECU":{"t":"ECU","g":"E","w":0,"d":1,"l":1,"gf":0,"ga":1,"pts":1,"played":2,"h2h":{"CIV":{"gf":0,"ga":1},"CUW":{"gf":0,"ga":0}},"gd":-1},"CUW":{"t":"CUW","g":"E","w":0,"d":1,"l":1,"gf":1,"ga":7,"pts":1,"played":2,"h2h":{"GER":{"gf":1,"ga":7},"ECU":{"gf":0,"ga":0}},"gd":-6},"NED":{"t":"NED","g":"F","w":1,"d":1,"l":0,"gf":7,"ga":3,"pts":4,"played":2,"h2h":{"JPN":{"gf":2,"ga":2},"SWE":{"gf":5,"ga":1}},"gd":4},"SWE":{"t":"SWE","g":"F","w":1,"d":0,"l":1,"gf":6,"ga":6,"pts":3,"played":2,"h2h":{"TUN":{"gf":5,"ga":1},"NED":{"gf":1,"ga":5}},"gd":0},"JPN":{"t":"JPN","g":"F","w":1,"d":1,"l":0,"gf":6,"ga":2,"pts":4,"played":2,"h2h":{"NED":{"gf":2,"ga":2},"TUN":{"gf":4,"ga":0}},"gd":4},"TUN":{"t":"TUN","g":"F","w":0,"d":0,"l":2,"gf":1,"ga":9,"pts":0,"played":2,"h2h":{"SWE":{"gf":1,"ga":5},"JPN":{"gf":0,"ga":4}},"gd":-8},"NZL":{"t":"NZL","g":"G","w":0,"d":1,"l":0,"gf":2,"ga":2,"pts":1,"played":1,"h2h":{"IRN":{"gf":2,"ga":2}},"gd":0},"IRN":{"t":"IRN","g":"G","w":0,"d":1,"l":0,"gf":2,"ga":2,"pts":1,"played":1,"h2h":{"NZL":{"gf":2,"ga":2}},"gd":0},"BEL":{"t":"BEL","g":"G","w":0,"d":1,"l":0,"gf":1,"ga":1,"pts":1,"played":1,"h2h":{"EGY":{"gf":1,"ga":1}},"gd":0},"EGY":{"t":"EGY","g":"G","w":0,"d":1,"l":0,"gf":1,"ga":1,"pts":1,"played":1,"h2h":{"BEL":{"gf":1,"ga":1}},"gd":0},"URU":{"t":"URU","g":"H","w":0,"d":1,"l":0,"gf":1,"ga":1,"pts":1,"played":1,"h2h":{"KSA":{"gf":1,"ga":1}},"gd":0},"KSA":{"t":"KSA","g":"H","w":0,"d":1,"l":0,"gf":1,"ga":1,"pts":1,"played":1,"h2h":{"URU":{"gf":1,"ga":1}},"gd":0},"ESP":{"t":"ESP","g":"H","w":0,"d":1,"l":0,"gf":0,"ga":0,"pts":1,"played":1,"h2h":{"CPV":{"gf":0,"ga":0}},"gd":0},"CPV":{"t":"CPV","g":"H","w":0,"d":1,"l":0,"gf":0,"ga":0,"pts":1,"played":1,"h2h":{"ESP":{"gf":0,"ga":0}},"gd":0},"NOR":{"t":"NOR","g":"I","w":1,"d":0,"l":0,"gf":4,"ga":1,"pts":3,"played":1,"h2h":{"IRQ":{"gf":4,"ga":1}},"gd":3},"FRA":{"t":"FRA","g":"I","w":1,"d":0,"l":0,"gf":3,"ga":1,"pts":3,"played":1,"h2h":{"SEN":{"gf":3,"ga":1}},"gd":2},"SEN":{"t":"SEN","g":"I","w":0,"d":0,"l":1,"gf":1,"ga":3,"pts":0,"played":1,"h2h":{"FRA":{"gf":1,"ga":3}},"gd":-2},"IRQ":{"t":"IRQ","g":"I","w":0,"d":0,"l":1,"gf":1,"ga":4,"pts":0,"played":1,"h2h":{"NOR":{"gf":1,"ga":4}},"gd":-3},"ARG":{"t":"ARG","g":"J","w":1,"d":0,"l":0,"gf":3,"ga":0,"pts":3,"played":1,"h2h":{"DZA":{"gf":3,"ga":0}},"gd":3},"AUT":{"t":"AUT","g":"J","w":1,"d":0,"l":0,"gf":3,"ga":1,"pts":3,"played":1,"h2h":{"JOR":{"gf":3,"ga":1}},"gd":2},"JOR":{"t":"JOR","g":"J","w":0,"d":0,"l":1,"gf":1,"ga":3,"pts":0,"played":1,"h2h":{"AUT":{"gf":1,"ga":3}},"gd":-2},"DZA":{"t":"DZA","g":"J","w":0,"d":0,"l":1,"gf":0,"ga":3,"pts":0,"played":1,"h2h":{"ARG":{"gf":0,"ga":3}},"gd":-3},"COL":{"t":"COL","g":"K","w":1,"d":0,"l":0,"gf":3,"ga":1,"pts":3,"played":1,"h2h":{"UZB":{"gf":3,"ga":1}},"gd":2},"COD":{"t":"COD","g":"K","w":0,"d":1,"l":0,"gf":1,"ga":1,"pts":1,"played":1,"h2h":{"POR":{"gf":1,"ga":1}},"gd":0},"POR":{"t":"POR","g":"K","w":0,"d":1,"l":0,"gf":1,"ga":1,"pts":1,"played":1,"h2h":{"COD":{"gf":1,"ga":1}},"gd":0},"UZB":{"t":"UZB","g":"K","w":0,"d":0,"l":1,"gf":1,"ga":3,"pts":0,"played":1,"h2h":{"COL":{"gf":1,"ga":3}},"gd":-2},"ENG":{"t":"ENG","g":"L","w":1,"d":0,"l":0,"gf":4,"ga":2,"pts":3,"played":1,"h2h":{"CRO":{"gf":4,"ga":2}},"gd":2},"GHA":{"t":"GHA","g":"L","w":1,"d":0,"l":0,"gf":1,"ga":0,"pts":3,"played":1,"h2h":{"PAN":{"gf":1,"ga":0}},"gd":1},"PAN":{"t":"PAN","g":"L","w":0,"d":0,"l":1,"gf":0,"ga":1,"pts":0,"played":1,"h2h":{"GHA":{"gf":0,"ga":1}},"gd":-1},"CRO":{"t":"CRO","g":"L","w":0,"d":0,"l":1,"gf":2,"ga":4,"pts":0,"played":1,"h2h":{"ENG":{"gf":2,"ga":4}},"gd":-2}};
-const matchData = [["MEX",2,"RSA",0],["KOR",2,"CZE",1],["CAN",1,"BIH",1],["USA",4,"PAR",1],["QAT",1,"SUI",1],["BRA",1,"MAR",1],["HTI",0,"SCO",1],["AUS",2,"TUR",0],["GER",7,"CUW",1],["NED",2,"JPN",2],["CIV",1,"ECU",0],["SWE",5,"TUN",1],["ESP",0,"CPV",0],["BEL",1,"EGY",1],["KSA",1,"URU",1],["IRN",2,"NZL",2],["FRA",3,"SEN",1],["IRQ",1,"NOR",4],["ARG",3,"DZA",0],["AUT",3,"JOR",1],["POR",1,"COD",1],["ENG",4,"CRO",2],["GHA",1,"PAN",0],["UZB",1,"COL",3],["CZE",1,"RSA",1],["SUI",4,"BIH",1],["CAN",6,"QAT",0],["MEX",1,"KOR",0],["USA",2,"AUS",0],["SCO",0,"MAR",1],["BRA",3,"HTI",0],["TUR",0,"PAR",1],["NED",5,"SWE",1],["GER",2,"CIV",1],["TUN",0,"JPN",4],["ECU",0,"CUW",0]];
+const st = {"MEX":{"t":"MEX","g":"A","w":2,"d":0,"l":0,"gf":3,"ga":0,"pts":6,"played":2,"h2h":{"RSA":{"gf":2,"ga":0},"KOR":{"gf":1,"ga":0}},"gd":3},"KOR":{"t":"KOR","g":"A","w":1,"d":0,"l":1,"gf":2,"ga":2,"pts":3,"played":2,"h2h":{"CZE":{"gf":2,"ga":1},"MEX":{"gf":0,"ga":1}},"gd":0},"CZE":{"t":"CZE","g":"A","w":0,"d":1,"l":1,"gf":2,"ga":3,"pts":1,"played":2,"h2h":{"KOR":{"gf":1,"ga":2},"RSA":{"gf":1,"ga":1}},"gd":-1},"RSA":{"t":"RSA","g":"A","w":0,"d":1,"l":1,"gf":1,"ga":3,"pts":1,"played":2,"h2h":{"MEX":{"gf":0,"ga":2},"CZE":{"gf":1,"ga":1}},"gd":-2},"CAN":{"t":"CAN","g":"B","w":1,"d":1,"l":0,"gf":7,"ga":1,"pts":4,"played":2,"h2h":{"BIH":{"gf":1,"ga":1},"QAT":{"gf":6,"ga":0}},"gd":6},"SUI":{"t":"SUI","g":"B","w":1,"d":1,"l":0,"gf":5,"ga":2,"pts":4,"played":2,"h2h":{"QAT":{"gf":1,"ga":1},"BIH":{"gf":4,"ga":1}},"gd":3},"BIH":{"t":"BIH","g":"B","w":0,"d":1,"l":1,"gf":2,"ga":5,"pts":1,"played":2,"h2h":{"CAN":{"gf":1,"ga":1},"SUI":{"gf":1,"ga":4}},"gd":-3},"QAT":{"t":"QAT","g":"B","w":0,"d":1,"l":1,"gf":1,"ga":7,"pts":1,"played":2,"h2h":{"SUI":{"gf":1,"ga":1},"CAN":{"gf":0,"ga":6}},"gd":-6},"BRA":{"t":"BRA","g":"C","w":1,"d":1,"l":0,"gf":4,"ga":1,"pts":4,"played":2,"h2h":{"MAR":{"gf":1,"ga":1},"HTI":{"gf":3,"ga":0}},"gd":3},"MAR":{"t":"MAR","g":"C","w":1,"d":1,"l":0,"gf":2,"ga":1,"pts":4,"played":2,"h2h":{"BRA":{"gf":1,"ga":1},"SCO":{"gf":1,"ga":0}},"gd":1},"SCO":{"t":"SCO","g":"C","w":1,"d":0,"l":1,"gf":1,"ga":1,"pts":3,"played":2,"h2h":{"HTI":{"gf":1,"ga":0},"MAR":{"gf":0,"ga":1}},"gd":0},"HTI":{"t":"HTI","g":"C","w":0,"d":0,"l":2,"gf":0,"ga":4,"pts":0,"played":2,"h2h":{"SCO":{"gf":0,"ga":1},"BRA":{"gf":0,"ga":3}},"gd":-4},"USA":{"t":"USA","g":"D","w":2,"d":0,"l":0,"gf":6,"ga":1,"pts":6,"played":2,"h2h":{"PAR":{"gf":4,"ga":1},"AUS":{"gf":2,"ga":0}},"gd":5},"AUS":{"t":"AUS","g":"D","w":1,"d":0,"l":1,"gf":2,"ga":2,"pts":3,"played":2,"h2h":{"TUR":{"gf":2,"ga":0},"USA":{"gf":0,"ga":2}},"gd":0},"PAR":{"t":"PAR","g":"D","w":1,"d":0,"l":1,"gf":2,"ga":4,"pts":3,"played":2,"h2h":{"USA":{"gf":1,"ga":4},"TUR":{"gf":1,"ga":0}},"gd":-2},"TUR":{"t":"TUR","g":"D","w":0,"d":0,"l":2,"gf":0,"ga":3,"pts":0,"played":2,"h2h":{"AUS":{"gf":0,"ga":2},"PAR":{"gf":0,"ga":1}},"gd":-3},"GER":{"t":"GER","g":"E","w":2,"d":0,"l":0,"gf":9,"ga":2,"pts":6,"played":2,"h2h":{"CUW":{"gf":7,"ga":1},"CIV":{"gf":2,"ga":1}},"gd":7},"CIV":{"t":"CIV","g":"E","w":1,"d":0,"l":1,"gf":2,"ga":2,"pts":3,"played":2,"h2h":{"ECU":{"gf":1,"ga":0},"GER":{"gf":1,"ga":2}},"gd":0},"ECU":{"t":"ECU","g":"E","w":0,"d":1,"l":1,"gf":0,"ga":1,"pts":1,"played":2,"h2h":{"CIV":{"gf":0,"ga":1},"CUW":{"gf":0,"ga":0}},"gd":-1},"CUW":{"t":"CUW","g":"E","w":0,"d":1,"l":1,"gf":1,"ga":7,"pts":1,"played":2,"h2h":{"GER":{"gf":1,"ga":7},"ECU":{"gf":0,"ga":0}},"gd":-6},"NED":{"t":"NED","g":"F","w":1,"d":1,"l":0,"gf":7,"ga":3,"pts":4,"played":2,"h2h":{"JPN":{"gf":2,"ga":2},"SWE":{"gf":5,"ga":1}},"gd":4},"SWE":{"t":"SWE","g":"F","w":1,"d":0,"l":1,"gf":6,"ga":6,"pts":3,"played":2,"h2h":{"TUN":{"gf":5,"ga":1},"NED":{"gf":1,"ga":5}},"gd":0},"JPN":{"t":"JPN","g":"F","w":1,"d":1,"l":0,"gf":6,"ga":2,"pts":4,"played":2,"h2h":{"NED":{"gf":2,"ga":2},"TUN":{"gf":4,"ga":0}},"gd":4},"TUN":{"t":"TUN","g":"F","w":0,"d":0,"l":2,"gf":1,"ga":9,"pts":0,"played":2,"h2h":{"SWE":{"gf":1,"ga":5},"JPN":{"gf":0,"ga":4}},"gd":-8},"NZL":{"t":"NZL","g":"G","w":0,"d":1,"l":1,"gf":3,"ga":5,"pts":1,"played":2,"h2h":{"IRN":{"gf":2,"ga":2},"EGY":{"gf":1,"ga":3}},"gd":-2},"IRN":{"t":"IRN","g":"G","w":0,"d":2,"l":0,"gf":2,"ga":2,"pts":2,"played":2,"h2h":{"NZL":{"gf":2,"ga":2},"BEL":{"gf":0,"ga":0}},"gd":0},"BEL":{"t":"BEL","g":"G","w":0,"d":2,"l":0,"gf":1,"ga":1,"pts":2,"played":2,"h2h":{"EGY":{"gf":1,"ga":1},"IRN":{"gf":0,"ga":0}},"gd":0},"EGY":{"t":"EGY","g":"G","w":1,"d":1,"l":0,"gf":4,"ga":2,"pts":4,"played":2,"h2h":{"BEL":{"gf":1,"ga":1},"NZL":{"gf":3,"ga":1}},"gd":2},"URU":{"t":"URU","g":"H","w":0,"d":2,"l":0,"gf":3,"ga":3,"pts":2,"played":2,"h2h":{"KSA":{"gf":1,"ga":1},"CPV":{"gf":2,"ga":2}},"gd":0},"KSA":{"t":"KSA","g":"H","w":0,"d":1,"l":1,"gf":1,"ga":5,"pts":1,"played":2,"h2h":{"URU":{"gf":1,"ga":1},"ESP":{"gf":0,"ga":4}},"gd":-4},"ESP":{"t":"ESP","g":"H","w":1,"d":1,"l":0,"gf":4,"ga":0,"pts":4,"played":2,"h2h":{"CPV":{"gf":0,"ga":0},"KSA":{"gf":4,"ga":0}},"gd":4},"CPV":{"t":"CPV","g":"H","w":0,"d":2,"l":0,"gf":2,"ga":2,"pts":2,"played":2,"h2h":{"ESP":{"gf":0,"ga":0},"URU":{"gf":2,"ga":2}},"gd":0},"NOR":{"t":"NOR","g":"I","w":1,"d":0,"l":0,"gf":4,"ga":1,"pts":3,"played":1,"h2h":{"IRQ":{"gf":4,"ga":1}},"gd":3},"FRA":{"t":"FRA","g":"I","w":1,"d":0,"l":0,"gf":3,"ga":1,"pts":3,"played":1,"h2h":{"SEN":{"gf":3,"ga":1}},"gd":2},"SEN":{"t":"SEN","g":"I","w":0,"d":0,"l":1,"gf":1,"ga":3,"pts":0,"played":1,"h2h":{"FRA":{"gf":1,"ga":3}},"gd":-2},"IRQ":{"t":"IRQ","g":"I","w":0,"d":0,"l":1,"gf":1,"ga":4,"pts":0,"played":1,"h2h":{"NOR":{"gf":1,"ga":4}},"gd":-3},"ARG":{"t":"ARG","g":"J","w":1,"d":0,"l":0,"gf":3,"ga":0,"pts":3,"played":1,"h2h":{"DZA":{"gf":3,"ga":0}},"gd":3},"AUT":{"t":"AUT","g":"J","w":1,"d":0,"l":0,"gf":3,"ga":1,"pts":3,"played":1,"h2h":{"JOR":{"gf":3,"ga":1}},"gd":2},"JOR":{"t":"JOR","g":"J","w":0,"d":0,"l":1,"gf":1,"ga":3,"pts":0,"played":1,"h2h":{"AUT":{"gf":1,"ga":3}},"gd":-2},"DZA":{"t":"DZA","g":"J","w":0,"d":0,"l":1,"gf":0,"ga":3,"pts":0,"played":1,"h2h":{"ARG":{"gf":0,"ga":3}},"gd":-3},"COL":{"t":"COL","g":"K","w":1,"d":0,"l":0,"gf":3,"ga":1,"pts":3,"played":1,"h2h":{"UZB":{"gf":3,"ga":1}},"gd":2},"COD":{"t":"COD","g":"K","w":0,"d":1,"l":0,"gf":1,"ga":1,"pts":1,"played":1,"h2h":{"POR":{"gf":1,"ga":1}},"gd":0},"POR":{"t":"POR","g":"K","w":0,"d":1,"l":0,"gf":1,"ga":1,"pts":1,"played":1,"h2h":{"COD":{"gf":1,"ga":1}},"gd":0},"UZB":{"t":"UZB","g":"K","w":0,"d":0,"l":1,"gf":1,"ga":3,"pts":0,"played":1,"h2h":{"COL":{"gf":1,"ga":3}},"gd":-2},"ENG":{"t":"ENG","g":"L","w":1,"d":0,"l":0,"gf":4,"ga":2,"pts":3,"played":1,"h2h":{"CRO":{"gf":4,"ga":2}},"gd":2},"GHA":{"t":"GHA","g":"L","w":1,"d":0,"l":0,"gf":1,"ga":0,"pts":3,"played":1,"h2h":{"PAN":{"gf":1,"ga":0}},"gd":1},"PAN":{"t":"PAN","g":"L","w":0,"d":0,"l":1,"gf":0,"ga":1,"pts":0,"played":1,"h2h":{"GHA":{"gf":0,"ga":1}},"gd":-1},"CRO":{"t":"CRO","g":"L","w":0,"d":0,"l":1,"gf":2,"ga":4,"pts":0,"played":1,"h2h":{"ENG":{"gf":2,"ga":4}},"gd":-2}};
+const matchData = [["MEX",2,"RSA",0],["KOR",2,"CZE",1],["CAN",1,"BIH",1],["USA",4,"PAR",1],["QAT",1,"SUI",1],["BRA",1,"MAR",1],["HTI",0,"SCO",1],["AUS",2,"TUR",0],["GER",7,"CUW",1],["NED",2,"JPN",2],["CIV",1,"ECU",0],["SWE",5,"TUN",1],["ESP",0,"CPV",0],["BEL",1,"EGY",1],["KSA",1,"URU",1],["IRN",2,"NZL",2],["FRA",3,"SEN",1],["IRQ",1,"NOR",4],["ARG",3,"DZA",0],["AUT",3,"JOR",1],["POR",1,"COD",1],["ENG",4,"CRO",2],["GHA",1,"PAN",0],["UZB",1,"COL",3],["CZE",1,"RSA",1],["SUI",4,"BIH",1],["CAN",6,"QAT",0],["MEX",1,"KOR",0],["USA",2,"AUS",0],["SCO",0,"MAR",1],["BRA",3,"HTI",0],["TUR",0,"PAR",1],["NED",5,"SWE",1],["GER",2,"CIV",1],["TUN",0,"JPN",4],["ECU",0,"CUW",0],["ESP",4,"KSA",0],["BEL",0,"IRN",0],["URU",2,"CPV",2],["NZL",1,"EGY",3]];
 const NAME = {MEX:"Mexique",KOR:"Corée du Sud",CZE:"Tchéquie",RSA:"Afrique du Sud",CAN:"Canada",SUI:"Suisse",BIH:"Bosnie",QAT:"Qatar",BRA:"Brésil",MAR:"Maroc",SCO:"Écosse",HTI:"Haïti",USA:"États-Unis",AUS:"Australie",PAR:"Paraguay",TUR:"Turquie",GER:"Allemagne",CIV:"Côte d'Ivoire",ECU:"Équateur",CUW:"Curaçao",NED:"Pays-Bas",SWE:"Suède",JPN:"Japon",TUN:"Tunisie",NZL:"Nouvelle-Zélande",IRN:"Iran",BEL:"Belgique",EGY:"Égypte",URU:"Uruguay",KSA:"Arabie saoudite",ESP:"Espagne",CPV:"Cap-Vert",NOR:"Norvège",FRA:"France",SEN:"Sénégal",IRQ:"Irak",ARG:"Argentine",AUT:"Autriche",JOR:"Jordanie",DZA:"Algérie",COL:"Colombie",COD:"RD Congo",POR:"Portugal",UZB:"Ouzbékistan",ENG:"Angleterre",GHA:"Ghana",PAN:"Panama",CRO:"Croatie"};
 const FLAG = {MEX:"🇲🇽",KOR:"🇰🇷",CZE:"🇨🇿",RSA:"🇿🇦",CAN:"🇨🇦",SUI:"🇨🇭",BIH:"🇧🇦",QAT:"🇶🇦",BRA:"🇧🇷",MAR:"🇲🇦",SCO:"🏴󠁧󠁢󠁳󠁣󠁴󠁿",HTI:"🇭🇹",USA:"🇺🇸",AUS:"🇦🇺",PAR:"🇵🇾",TUR:"🇹🇷",GER:"🇩🇪",CIV:"🇨🇮",ECU:"🇪🇨",CUW:"🇨🇼",NED:"🇳🇱",SWE:"🇸🇪",JPN:"🇯🇵",TUN:"🇹🇳",NZL:"🇳🇿",IRN:"🇮🇷",BEL:"🇧🇪",EGY:"🇪🇬",URU:"🇺🇾",KSA:"🇸🇦",ESP:"🇪🇸",CPV:"🇨🇻",NOR:"🇳🇴",FRA:"🇫🇷",SEN:"🇸🇳",IRQ:"🇮🇶",ARG:"🇦🇷",AUT:"🇦🇹",JOR:"🇯🇴",DZA:"🇩🇿",COL:"🇨🇴",COD:"🇨🇩",POR:"🇵🇹",UZB:"🇺🇿",ENG:"🏴󠁧󠁢󠁥󠁮󠁧󠁿",GHA:"🇬🇭",PAN:"🇵🇦",CRO:"🇭🇷"};
 
@@ -126,6 +127,89 @@ function flagImg(code, size){
 }
 
 Object.keys(st).forEach(k=>{ st[k].name=NAME[k]; st[k].flag=FLAG[k]; });
+
+// ============ COUCHE LIVE (API-Football via fonction Netlify) ============
+// Mappe les noms d'équipes renvoyés par l'API vers nos codes internes.
+const API_NAME_TO_CODE = {
+  "Mexico":"MEX","South Korea":"KOR","Korea Republic":"KOR","Czech Republic":"CZE","Czechia":"CZE","South Africa":"RSA",
+  "Canada":"CAN","Switzerland":"SUI","Bosnia and Herzegovina":"BIH","Bosnia & Herzegovina":"BIH","Qatar":"QAT",
+  "Brazil":"BRA","Morocco":"MAR","Scotland":"SCO","Haiti":"HTI",
+  "USA":"USA","United States":"USA","Australia":"AUS","Paraguay":"PAR","Turkey":"TUR","Türkiye":"TUR","Turkiye":"TUR",
+  "Germany":"GER","Ivory Coast":"CIV","Cote d'Ivoire":"CIV","Côte d'Ivoire":"CIV","Ecuador":"ECU","Curacao":"CUW","Curaçao":"CUW",
+  "Netherlands":"NED","Sweden":"SWE","Japan":"JPN","Tunisia":"TUN",
+  "New Zealand":"NZL","Iran":"IRN","Belgium":"BEL","Egypt":"EGY",
+  "Uruguay":"URU","Saudi Arabia":"KSA","Spain":"ESP","Cape Verde":"CPV","Cape Verde Islands":"CPV","Cabo Verde":"CPV",
+  "Norway":"NOR","France":"FRA","Senegal":"SEN","Iraq":"IRQ",
+  "Argentina":"ARG","Austria":"AUT","Jordan":"JOR","Algeria":"DZA",
+  "Colombia":"COL","DR Congo":"COD","Congo DR":"COD","Democratic Republic of the Congo":"COD","Portugal":"POR","Uzbekistan":"UZB",
+  "England":"ENG","Ghana":"GHA","Panama":"PAN","Croatia":"CRO"
+};
+function apiCode(name){
+  if(!name) return null;
+  if(API_NAME_TO_CODE[name]) return API_NAME_TO_CODE[name];
+  // tolérance : enlève accents/casse
+  const norm = name.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().trim();
+  for(const [k,v] of Object.entries(API_NAME_TO_CODE)){
+    if(k.normalize('NFD').replace(/[̀-ͯ]/g,'').toLowerCase().trim()===norm) return v;
+  }
+  return null;
+}
+
+// Reconstruit st + matchData à partir des fixtures live (matchs terminés uniquement pour le classement,
+// la phase de groupes). Renvoie {st, matches} ou null si données inexploitables.
+function buildFromLive(fixtures){
+  const GRP_OF = {}; for(const code in st) GRP_OF[code]=st[code].g;
+  const fresh={}; for(const code in st){ fresh[code]={t:code,g:st[code].g,w:0,d:0,l:0,gf:0,ga:0,pts:0,played:0,h2h:{}}; }
+  const liveMatches=[];
+  let usable=0;
+  fixtures.forEach(f=>{
+    // ne garder que la phase de groupes pour les classements
+    const isGroup = /group/i.test(f.round||"");
+    const hc=apiCode(f.home), ac=apiCode(f.away);
+    if(!hc||!ac||!fresh[hc]||!fresh[ac]) return;
+    const done = f.status==='FT' || f.status==='AET' || f.status==='PEN';
+    if(done && f.homeGoals!=null && f.awayGoals!=null){
+      liveMatches.push([hc,f.homeGoals,ac,f.awayGoals]);
+      if(isGroup){
+        const H=fresh[hc],A=fresh[ac],hs=f.homeGoals,as=f.awayGoals;
+        H.gf+=hs;H.ga+=as;H.played++; A.gf+=as;A.ga+=hs;A.played++;
+        H.h2h[ac]={gf:hs,ga:as}; A.h2h[hc]={gf:as,ga:hs};
+        if(hs>as){H.w++;H.pts+=3;A.l++;} else if(hs<as){A.w++;A.pts+=3;H.l++;} else {H.d++;A.d++;H.pts++;A.pts++;}
+        usable++;
+      }
+    }
+  });
+  if(usable<1) return null; // rien d'exploitable -> on garde les données figées
+  for(const c in fresh) fresh[c].gd=fresh[c].gf-fresh[c].ga;
+  return { st:fresh, matches:liveMatches };
+}
+
+async function tryLive(){
+  try{
+    const ctrl=new AbortController(); const to=setTimeout(()=>ctrl.abort(),6000);
+    const r=await fetch('/api/scores',{signal:ctrl.signal}); clearTimeout(to);
+    if(!r.ok) return false;
+    const d=await r.json();
+    if(d.error || !Array.isArray(d.fixtures)) return false;
+    const rebuilt=buildFromLive(d.fixtures);
+    if(!rebuilt) return false;
+    // Remplacer les données globales puis laisser le rendu se faire
+    for(const k in st) delete st[k];
+    Object.assign(st, rebuilt.st);
+    Object.keys(st).forEach(k=>{ st[k].name=NAME[k]; st[k].flag=FLAG[k]; });
+    matchData.length=0; rebuilt.matches.forEach(m=>matchData.push(m));
+    return true;
+  }catch(e){ return false; }
+}
+// ============ FIN COUCHE LIVE ============
+
+
+// Conteneurs (vidés à chaque rendu pour permettre le re-render après l'API)
+function clearAll(){ ['groups','tv','thirds','bracket','matches'].forEach(id=>{const el=document.getElementById(id); if(el) el.innerHTML='';}); }
+
+function renderAll(){
+clearAll();
+
 
 function h2hStats(teams){const m={};teams.forEach(t=>m[t.t]={pts:0,gf:0,ga:0});teams.forEach(t=>teams.forEach(o=>{if(t.t!==o.t){const r=t.h2h[o.t];if(r){m[t.t].gf+=r.gf;m[t.t].ga+=r.ga;if(r.gf>r.ga)m[t.t].pts+=3;else if(r.gf===r.ga)m[t.t].pts+=1;}}}));Object.keys(m).forEach(k=>m[k].gd=m[k].gf-m[k].ga);return m;}
 function fifaOrder(g){let a=[...g].sort((x,y)=>y.pts-x.pts);const o=[];let i=0;while(i<a.length){let j=i;while(j<a.length&&a[j].pts===a[i].pts)j++;let t=a.slice(i,j);if(t.length>1){const h=h2hStats(t);t.sort((x,y)=>{if(h[y.t].pts!==h[x.t].pts)return h[y.t].pts-h[x.t].pts;if(h[y.t].gd!==h[x.t].gd)return h[y.t].gd-h[x.t].gd;if(h[y.t].gf!==h[x.t].gf)return h[y.t].gf-h[x.t].gf;if(y.gd!==x.gd)return y.gd-x.gd;if(y.gf!==x.gf)return y.gf-x.gf;return x.name.localeCompare(y.name);});}o.push(...t);i=j;}return o;}
@@ -260,15 +344,13 @@ br.innerHTML=out;
 
 // ---- DIFFUSION DU JOUR (21 juin, heures de Paris) ----
 const tvGames = [
-  {h:"TUN",a:"JPN",time:"14:00",maroc:"13:00",gr:"Groupe F",state:"done",score:"0 – 4",
+  {h:"ARG",a:"AUT",time:"19:00",maroc:"18:00",gr:"Groupe J",state:"soon",
    fr:[{n:"beIN Sports 1"}], mena:[{n:"beIN MENA"}]},
-  {h:"ESP",a:"KSA",time:"18:00",maroc:"17:00",gr:"Groupe H",state:"soon",
-   fr:[{n:"M6",clear:true},{n:"beIN Sports 1"}], mena:[{n:"beIN MENA"}]},
-  {h:"BEL",a:"IRN",time:"21:00",maroc:"20:00",gr:"Groupe G",state:"soon",
-   fr:[{n:"M6",clear:true},{n:"beIN Sports 1"}], mena:[{n:"beIN MENA"}]},
-  {h:"URU",a:"CPV",time:"00:00",maroc:"23:00",gr:"Groupe H",state:"soon",
+  {h:"FRA",a:"IRQ",time:"23:00",maroc:"22:00",gr:"Groupe I",state:"soon",
+   fr:[{n:"TF1",clear:true},{n:"beIN Sports 1"}], mena:[{n:"beIN MENA"}]},
+  {h:"NOR",a:"SEN",time:"02:00",maroc:"01:00",gr:"Groupe I",state:"soon",
    fr:[{n:"beIN Sports 1"}], mena:[{n:"beIN MENA"}]},
-  {h:"NZL",a:"EGY",time:"03:00",maroc:"02:00",gr:"Groupe G",state:"soon",
+  {h:"JOR",a:"DZA",time:"05:00",maroc:"04:00",gr:"Groupe J",state:"soon",
    fr:[{n:"beIN Sports 1"}], mena:[{n:"beIN MENA"}]}
 ];
 const tvEl=document.getElementById('tv');
@@ -290,6 +372,16 @@ tvGames.forEach(g=>{
 // ---- RÉSULTATS ----
 const me=document.getElementById('matches');
 matchData.forEach(m=>{const h=NAME[m[0]],a=NAME[m[2]],hf=flagImg(m[0]),af=flagImg(m[2]);const hw=m[1]>m[3],dr=m[1]===m[3];me.innerHTML+=`<div class="m"><span class="s"><span class="f">${hf}</span><span class="${hw?'w':'l'}">${h}</span></span><span class="c"><span class="${hw?'w':'l'}">${m[1]}</span> – <span class="${!hw&&!dr?'w':'l'}">${m[3]}</span></span><span class="s a"><span class="f">${af}</span><span class="${!hw&&!dr?'w':'l'}">${a}</span></span></div>`;});
+
+} // fin renderAll
+
+// 1er rendu immédiat avec les données figées (fallback), puis tentative live
+renderAll();
+tryLive().then(ok=>{ if(ok){ renderAll();
+  // bandeau d'état
+  let b=document.getElementById('live-badge'); if(b) b.textContent='● Données live (API)';
+} });
+
 </script>
 </body>
 </html>
