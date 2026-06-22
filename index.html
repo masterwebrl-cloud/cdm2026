@@ -87,6 +87,12 @@ footer{text-align:center;font-size:11px;color:var(--dim);margin-top:44px;padding
 <div id="live-badge" style="margin-top:8px;font-size:12px;color:var(--dim);">○ Données figées (mise à jour manuelle)</div>
 <div class="sub">Canada · Mexique · États-Unis</div>
 
+<div id="live-wrap" style="display:none;">
+<h2>⚽ En direct</h2>
+<div class="sec-tag">Matchs en cours — score live, non encore compté au classement</div>
+<div class="mlist" id="live"></div>
+</div>
+
 <h2>Groupes</h2>
 <div class="sec-tag">Classement officiel FIFA : points › confrontation directe › différence de buts › buts marqués</div>
 <div class="groups" id="groups"></div>
@@ -163,20 +169,20 @@ function apiCode(name){
 }
 
 // Reconstruit st + matchData à partir des fixtures live (matchs terminés uniquement pour le classement,
-// la phase de groupes). Renvoie {st, matches} ou null si données inexploitables.
+// la phase de groupes). Renvoie {st, matches, live} ou null si données inexploitables.
 function buildFromLive(fixtures){
-  const GRP_OF = {}; for(const code in st) GRP_OF[code]=st[code].g;
   const fresh={}; for(const code in st){ fresh[code]={t:code,g:st[code].g,w:0,d:0,l:0,gf:0,ga:0,pts:0,played:0,h2h:{}}; }
-  const liveMatches=[];
+  const finishedMatches=[];
+  const inPlay=[];           // matchs en cours : {h,a,hs,as,status,group}
   let usable=0;
   fixtures.forEach(f=>{
-    // ne garder que la phase de groupes pour les classements
     const isGroup = /group/i.test((f.stage||"")+(f.group||""));
     const hc=tlaCode(f.homeTla)||apiCode(f.home), ac=tlaCode(f.awayTla)||apiCode(f.away);
     if(!hc||!ac||!fresh[hc]||!fresh[ac]) return;
     const done = f.status==='FINISHED';
+    const live = f.status==='IN_PLAY' || f.status==='PAUSED';   // PAUSED = mi-temps
     if(done && f.homeGoals!=null && f.awayGoals!=null){
-      liveMatches.push([hc,f.homeGoals,ac,f.awayGoals]);
+      finishedMatches.push([hc,f.homeGoals,ac,f.awayGoals]);
       if(isGroup){
         const H=fresh[hc],A=fresh[ac],hs=f.homeGoals,as=f.awayGoals;
         H.gf+=hs;H.ga+=as;H.played++; A.gf+=as;A.ga+=hs;A.played++;
@@ -184,12 +190,18 @@ function buildFromLive(fixtures){
         if(hs>as){H.w++;H.pts+=3;A.l++;} else if(hs<as){A.w++;A.pts+=3;H.l++;} else {H.d++;A.d++;H.pts++;A.pts++;}
         usable++;
       }
+    } else if(live){
+      inPlay.push({h:hc,a:ac,hs:(f.homeGoals==null?0:f.homeGoals),as:(f.awayGoals==null?0:f.awayGoals),status:f.status});
     }
   });
-  if(usable<1) return null; // rien d'exploitable -> on garde les données figées
+  // Si aucun match fini exploitable MAIS des matchs en cours, on garde quand même les données figées
+  // pour le classement, et on renvoie juste les matchs en cours.
   for(const c in fresh) fresh[c].gd=fresh[c].gf-fresh[c].ga;
-  return { st:fresh, matches:liveMatches };
+  return { st:(usable>=1?fresh:null), matches:(usable>=1?finishedMatches:null), live:inPlay };
 }
+
+// Stocke les matchs en cours pour le rendu (rempli par tryLive)
+let liveGames = [];
 
 async function tryLive(){
   try{
@@ -200,22 +212,45 @@ async function tryLive(){
     if(d.error || !Array.isArray(d.fixtures)) return false;
     const rebuilt=buildFromLive(d.fixtures);
     if(!rebuilt) return false;
-    // Remplacer les données globales puis laisser le rendu se faire
-    for(const k in st) delete st[k];
-    Object.assign(st, rebuilt.st);
-    Object.keys(st).forEach(k=>{ st[k].name=NAME[k]; st[k].flag=FLAG[k]; });
-    matchData.length=0; rebuilt.matches.forEach(m=>matchData.push(m));
-    return true;
+    liveGames = rebuilt.live || [];
+    // Ne remplacer le classement que si on a des matchs finis exploitables
+    if(rebuilt.st){
+      for(const k in st) delete st[k];
+      Object.assign(st, rebuilt.st);
+      Object.keys(st).forEach(k=>{ st[k].name=NAME[k]; st[k].flag=FLAG[k]; });
+      matchData.length=0; rebuilt.matches.forEach(m=>matchData.push(m));
+    }
+    // succès si on a soit un classement live, soit des matchs en cours à afficher
+    return !!(rebuilt.st || liveGames.length);
   }catch(e){ return false; }
 }
 // ============ FIN COUCHE LIVE ============
 
 
 // Conteneurs (vidés à chaque rendu pour permettre le re-render après l'API)
-function clearAll(){ ['groups','tv','thirds','bracket','matches'].forEach(id=>{const el=document.getElementById(id); if(el) el.innerHTML='';}); }
+function clearAll(){ ['groups','tv','thirds','bracket','matches','live'].forEach(id=>{const el=document.getElementById(id); if(el) el.innerHTML='';}); }
 
 function renderAll(){
 clearAll();
+
+// ---- MATCHS EN DIRECT (affichage seul, non compté au classement) ----
+(function(){
+  const wrap=document.getElementById('live-wrap');
+  const el=document.getElementById('live');
+  if(!el||!wrap) return;
+  if(!liveGames || !liveGames.length){ wrap.style.display='none'; return; }
+  wrap.style.display='';
+  el.innerHTML = liveGames.map(g=>{
+    const lbl = g.status==='PAUSED' ? 'MI-TEMPS' : 'EN DIRECT';
+    return '<div class="m" style="border-color:rgba(255,90,90,.45);flex-direction:column;align-items:stretch;gap:6px;">'
+      + '<div style="text-align:center;font-size:10px;color:#ff5a5a;font-weight:700;letter-spacing:.06em;">● '+lbl+'</div>'
+      + '<div style="display:flex;align-items:center;gap:8px;">'
+      + '<span class="s"><span class="f">'+flagImg(g.h)+'</span><span>'+(NAME[g.h]||g.h)+'</span></span>'
+      + '<span class="c"><span style="color:var(--text)">'+g.hs+'</span> – <span style="color:var(--text)">'+g.as+'</span></span>'
+      + '<span class="s a"><span class="f">'+flagImg(g.a)+'</span><span>'+(NAME[g.a]||g.a)+'</span></span>'
+      + '</div></div>';
+  }).join('');
+})();
 
 
 function h2hStats(teams){const m={};teams.forEach(t=>m[t.t]={pts:0,gf:0,ga:0});teams.forEach(t=>teams.forEach(o=>{if(t.t!==o.t){const r=t.h2h[o.t];if(r){m[t.t].gf+=r.gf;m[t.t].ga+=r.ga;if(r.gf>r.ga)m[t.t].pts+=3;else if(r.gf===r.ga)m[t.t].pts+=1;}}}));Object.keys(m).forEach(k=>m[k].gd=m[k].gf-m[k].ga);return m;}
@@ -384,10 +419,19 @@ matchData.forEach(m=>{const h=NAME[m[0]],a=NAME[m[2]],hf=flagImg(m[0]),af=flagIm
 
 // 1er rendu immédiat avec les données figées (fallback), puis tentative live
 renderAll();
-tryLive().then(ok=>{ if(ok){ renderAll();
-  // bandeau d'état
-  let b=document.getElementById('live-badge'); if(b) b.textContent='● Données live (API)';
-} });
+function refreshLive(){
+  tryLive().then(ok=>{
+    if(ok){
+      renderAll();
+      const b=document.getElementById('live-badge');
+      if(b) b.textContent = liveGames.length ? ('● Données live — '+liveGames.length+' match(s) en cours') : '● Données live (API)';
+    }
+    // Re-sonder : toutes les 60 s s'il y a du live, sinon toutes les 5 min
+    const next = (liveGames && liveGames.length) ? 60000 : 300000;
+    setTimeout(refreshLive, next);
+  });
+}
+refreshLive();
 
 </script>
 </body>
