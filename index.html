@@ -399,14 +399,16 @@ function broadcastFor(homeCode, awayCode){
 function renderTV(){
   const tvEl=document.getElementById('tv'); if(!tvEl) return;
   const tag=document.getElementById('tv-tag');
-  // Déterminer "aujourd'hui" en heure de Paris
+  // "Journée de compétition" : on se cale sur l'heure de l'Est US (America/New_York),
+  // là où se jouent la plupart des matchs. Ainsi les matchs d'une même soirée américaine
+  // restent groupés, même ceux qui finissent après minuit en Europe.
   const now=new Date();
-  const parisToday = now.toLocaleDateString('fr-CA',{timeZone:'Europe/Paris'}); // AAAA-MM-JJ
-  // Filtrer les fixtures du jour
+  const compDay = now.toLocaleDateString('fr-CA',{timeZone:'America/New_York'}); // AAAA-MM-JJ (jour US)
+  // Filtrer les fixtures de la journée de compétition
   let today = (allFixtures||[]).filter(f=>{
     if(!f.date) return false;
-    const d=new Date(f.date).toLocaleDateString('fr-CA',{timeZone:'Europe/Paris'});
-    return d===parisToday;
+    const d=new Date(f.date).toLocaleDateString('fr-CA',{timeZone:'America/New_York'});
+    return d===compDay;
   });
   // Ne garder que les équipes connues (codes mappés)
   today = today.map(f=>{
@@ -415,16 +417,23 @@ function renderTV(){
   }).filter(f=>f.hc && f.ac && NAME[f.hc] && NAME[f.ac]);
   today.sort((a,b)=> new Date(a.date)-new Date(b.date));
 
-  const dateLabel = now.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',timeZone:'Europe/Paris'});
-  if(tag) tag.textContent = dateLabel.charAt(0).toUpperCase()+dateLabel.slice(1)+' — heures de Paris (CEST) · diffuseurs indicatifs FR & MENA';
+  // Libellé : la journée de compétition US, mais on précise les dates Paris si ça déborde sur 2 jours
+  const usLabel = now.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',timeZone:'America/New_York'});
+  if(tag) tag.textContent = 'Journée du '+usLabel+' — heures de Paris (CEST) & Maroc · diffuseurs indicatifs FR & MENA';
 
   if(!today.length){
-    tvEl.innerHTML='<div style="padding:18px;color:var(--dim);font-size:13px;">Aucun match de Coupe du Monde aujourd\'hui.</div>';
+    tvEl.innerHTML='<div style="padding:18px;color:var(--dim);font-size:13px;">Aucun match de Coupe du Monde sur cette journée de compétition.</div>';
     return;
   }
   tvEl.innerHTML = today.map(f=>{
-    const hPar = new Date(f.date).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Paris'});
-    const hMar = new Date(f.date).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',timeZone:'Africa/Casablanca'});
+    const dt = new Date(f.date);
+    const hPar = dt.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Paris'});
+    const hMar = dt.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',timeZone:'Africa/Casablanca'});
+    // Jour de Paris du match vs jour de compétition US : si différent, on annote (ex. match à 2h = lendemain en Europe)
+    const parisDay = dt.toLocaleDateString('fr-CA',{timeZone:'Europe/Paris'});
+    const parisDow = dt.toLocaleDateString('fr-FR',{weekday:'short',timeZone:'Europe/Paris'}).replace('.','');
+    const overnight = (parisDay !== compDay);
+    const hParLabel = hPar + (overnight ? ' <span style="color:var(--dim);font-size:10px;">'+parisDow+'</span>' : '');
     const done = f.status==='FINISHED';
     const live = f.status==='IN_PLAY' || f.status==='PAUSED';
     const cls = done?'done':(live?'live':'');
@@ -436,7 +445,7 @@ function renderTV(){
     const menaChips=b.mena.map(c=>'<span class="chip maroc">'+flagImg('MAR',12)+' '+c.n+'</span>').join('');
     return '<div class="tvc '+cls+'">'
       + '<div class="top"><span class="match">'+flagImg(f.hc)+' '+NAME[f.hc]+' <span style="color:var(--dim)">v</span> '+NAME[f.ac]+' '+flagImg(f.ac)+'</span>'
-      + '<span class="hr">'+hPar+'</span></div>'
+      + '<span class="hr">'+hParLabel+'</span></div>'
       + '<div class="gr">'+flagImg('MAR',11)+' '+hMar+(badge?' · '+badge:'')+'</div>'
       + '<div class="ch">'+frChips+menaChips+'</div></div>';
   }).join('');
