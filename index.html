@@ -406,27 +406,44 @@ const R32=[
   {n:85,a:()=>pos1("B"),b:()=>posThirdM(85),la:"1er B",lb:thirdLabel(85)},
   {n:87,a:()=>pos1("K"),b:()=>posThirdM(87),la:"1er K",lb:thirdLabel(87)}
 ];
-// Résolution des équipes (16es)
-const win={}; // matchNum -> team projetée vainqueur
-R32.forEach(m=>{ m.tA=m.a(); m.tB=m.b(); win[m.n]=better(m.tA,m.tB); });
+// Résolution des équipes (16es) — projection à partir des classements actuels
+const win={};   // matchNum -> team projetée vainqueur (UNIQUEMENT si le match est réellement joué)
+const proj={};  // matchNum -> team projetée (pour les 16es, basé sur les classements)
+R32.forEach(m=>{ m.tA=m.a(); m.tB=m.b(); proj[m.n]=better(m.tA,m.tB); });
 
-// Tours suivants : on projette les vainqueurs jusqu'à la finale
+// Un match à élimination directe est-il réellement JOUÉ (résultat officiel via API) ?
+// Tant qu'on est en phase de groupes, aucun KO n'est joué -> renvoie le vainqueur réel ou null.
+function koWinner(matchNum){
+  if(!Array.isArray(allFixtures)) return null;
+  // On tente de retrouver le match par son numéro d'étape ; football-data ne donne pas notre numéro M73...
+  // donc on se base sur le statut : si un match KO est FINISHED et qu'on peut mapper, on l'utilisera.
+  // Pour l'instant (groupes), on renvoie null => tours suivants vides.
+  return null;
+}
+
+// Tours suivants : on ne remplit un match QUE si ses deux nourriciers sont réellement joués.
 const R16=[
   {n:89,x:74,y:77},{n:90,x:73,y:75},{n:91,x:76,y:78},{n:92,x:79,y:80},
   {n:93,x:83,y:84},{n:94,x:81,y:82},{n:95,x:86,y:88},{n:96,x:85,y:87}
 ];
-R16.forEach(m=>{ m.tA=win[m.x]; m.tB=win[m.y]; win[m.n]=better(m.tA,m.tB); });
 const QF=[{n:97,x:89,y:90},{n:98,x:93,y:94},{n:99,x:91,y:92},{n:100,x:95,y:96}];
-QF.forEach(m=>{ m.tA=win[m.x]; m.tB=win[m.y]; win[m.n]=better(m.tA,m.tB); });
 const SF=[{n:101,x:97,y:98},{n:102,x:99,y:100}];
-SF.forEach(m=>{ m.tA=win[m.x]; m.tB=win[m.y]; win[m.n]=better(m.tA,m.tB); });
-const FN={n:104,x:101,y:102}; FN.tA=win[101]; FN.tB=win[102]; win[104]=better(FN.tA,FN.tB);
+const FN={n:104,x:101,y:102};
+
+// Propagation conditionnelle : tA/tB d'un match KO ne sont remplis que si le nourricier est JOUÉ
+function feed(m){
+  m.tA = koWinner(m.x);  // vainqueur réel du match x, ou null
+  m.tB = koWinner(m.y);
+  // win[m.n] n'existe que si le match lui-même est joué (géré plus tard via API)
+  m.la = 'Vainqueur M'+m.x;
+  m.lb = 'Vainqueur M'+m.y;
+}
+[...R16,...QF,...SF,FN].forEach(feed);
 
 // Un groupe est "terminé" quand ses 6 matchs sont joués
 function groupDone(g){ return grp[g] ? (grp[g].reduce((s,x)=>s+x.played,0)/2)>=6 : false; }
-// Une équipe (objet) est "officiellement qualifiée" si son groupe est terminé
 function teamOfficial(t){ return t && t.g && groupDone(t.g); }
-// Un 16e est "validé" si ses deux équipes sont officiellement qualifiées
+// Un 16e est "validé" si ses deux équipes projetées sont officiellement qualifiées
 function tieValidated(m){ return teamOfficial(m.tA) && teamOfficial(m.tB); }
 
 // Rendu d'une case (réutilisé pour tous les tours)
@@ -436,8 +453,12 @@ function teamRow(team,label,isWin,pct){
   return `<div class="r"><span class="nm" style="color:var(--dim)">${label||"à déterminer"}</span>${pctHtml}</div>`;
 }
 function tieBox(m,labelA,labelB,extra){
-  const wA=win[m.n]&&m.tA&&win[m.n].t===m.tA.t;
-  const wB=win[m.n]&&m.tB&&win[m.n].t===m.tB.t;
+  const isR32 = !!R32_SCHED[m.n];
+  // Pour les 16es on utilise la projection ; pour les tours suivants, m.tA/m.tB (réels ou null)
+  if(isR32){ m.tA = m.a ? m.a() : m.tA; m.tB = m.b ? m.b() : m.tB; }
+  const winner = isR32 ? proj[m.n] : null; // surlignage favori seulement en 16es (projection)
+  const wA=winner&&m.tA&&winner.t===m.tA.t;
+  const wB=winner&&m.tB&&winner.t===m.tB.t;
   const s=R32_SCHED[m.n];
   const probs = probaMatch(m.tA,m.tB);
   const pA = probs? probs[0] : null;
@@ -471,16 +492,17 @@ const R2=[102];
 function col(title, nums, mapObj, isR32){
   let inner = nums.map(n=>{
     const m = mapObj[n];
-    return isR32 ? tieBox(m, m.la, m.lb) : tieBox(m);
+    return isR32 ? tieBox(m, m.la, m.lb) : tieBox(m, m.la, m.lb);
   }).join('');
   return `<div class="bcol"><div class="bcol-t">${title}</div>${inner}</div>`;
 }
 
-const champ = win[104];
+// Champion : seulement si la finale a un vainqueur RÉEL (sinon vide tant qu'on n'y est pas)
+const champ = (FN.tA && FN.tB) ? better(FN.tA,FN.tB) : null;
 const centerHtml = `
   <div class="bcol bcenter">
     <div class="bcol-t">Finale</div>
-    ${tieBox(FN)}
+    ${tieBox(FN, FN.la, FN.lb)}
     <div class="trophy"><div class="ic">🏆</div><div class="lb">Champion projeté</div><div class="champ">${champ?champ.flag+' '+champ.name:'—'}</div></div>
   </div>`;
 
