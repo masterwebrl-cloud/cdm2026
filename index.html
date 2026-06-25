@@ -91,45 +91,122 @@ footer{text-align:center;font-size:11px;color:var(--dim);margin-top:44px;padding
 <!-- Umami Analytics (sans cookie, conforme RGPD, pas de bannière nécessaire) -->
 <script defer src="https://cloud.umami.is/script.js" data-website-id="e72cf918-6b68-4300-b2d8-54c872fba15d"></script>
 <div class="wrap">
-<h1>Coupe du Monde<span class="yr">2026</span></h1>
-<div class="meta">40 matchs joués • Données réelles au 22 juin 2026</div>
-<div id="live-badge" style="margin-top:8px;font-size:12px;color:var(--dim);">○ Données figées (mise à jour manuelle)</div>
-<div class="sub">Canada · Mexique · États-Unis</div>
+<h1><span id="title-text">Coupe du Monde</span><span class="yr" id="year-text">2026</span></h1>
+
+<div class="meta" id="info-text"></div>
+<div id="live-badge" style="margin-top:8px;font-size:12px;color:var(--dim);"></div>
+<div class="sub" id="hosts-text"></div>
 
 <div id="live-wrap" style="display:none;">
-<h2>⚽ En direct</h2>
-<div class="sec-tag">Matchs en cours — score live, déjà pris en compte (provisoire ●) dans le classement et la projection</div>
+<h2 id="live-title">⚽ En direct</h2>
+<div class="sec-tag" id="live-tag"></div>
 <div class="mlist" id="live"></div>
 </div>
 
-<h2>Groupes</h2>
-<div class="sec-tag">Classement officiel FIFA : points › confrontation directe › différence de buts › buts marqués</div>
+<h2 id="groups-title">Groupes</h2>
+<div class="sec-tag" id="groups-tag"></div>
 <div class="groups" id="groups"></div>
 
-<h2>📺 Diffusion du jour</h2>
-<div class="sec-tag" id="tv-tag">Programme du jour — heures de Paris (CEST) · diffuseurs indicatifs FR & MENA</div>
+<h2 id="tv-title">📺 Diffusion du jour</h2>
+<div class="sec-tag" id="tv-tag"></div>
 <div class="tv" id="tv"></div>
 
-<h2>Top 8 des 3<sup>es</sup></h2>
-<div class="sec-tag">Les 8 meilleurs troisièmes complètent les 16es de finale</div>
+<h2 id="thirds-title">Top 8 des 3<sup>es</sup></h2>
+<div class="sec-tag" id="thirds-tag"></div>
 <div class="thirds" id="thirds"></div>
 
-<h2>16<sup>es</sup> de finale — projection</h2>
-<div class="sec-tag">Les 32 qualifiés projetés à partir des classements actuels</div>
-<div class="proj-banner">⚡ <b>Projection automatique.</b> Chaque match des 16es est rempli avec les positions actuelles (1ers, 2es et 8 meilleurs 3es selon la répartition officielle FIFA). Le vainqueur probable de chaque affiche est surligné. Tout se recalcule à l'ajout de nouveaux résultats — les groupes ne sont pas terminés, c'est donc indicatif.</div>
+<h2 id="bracket-title">16<sup>es</sup> de finale — projection</h2>
+<div class="sec-tag" id="bracket-tag"></div>
+<div class="proj-banner" id="bracket-banner"></div>
 <div style="overflow-x:auto;padding-bottom:14px;-webkit-overflow-scrolling:touch;"><div class="bracket" id="bracket"></div></div>
 
-<h2>Résultats</h2>
-<div class="sec-tag">Journées 1 & 2</div>
+<h2 id="results-title">Résultats</h2>
+<div class="sec-tag" id="results-tag"></div>
 <div class="mlist" id="matches"></div>
 
-<footer>FIFA World Cup 2026 • Données officielles au 20 juin • Classement avec confrontation directe • Projection indicative</footer>
+<footer id="footer-text"></footer>
 </div>
 
 <script>
+// ===== MULTILINGUE (7 langues : FR, EN, AR, ES, NL, JA, KO) =====
+// Détection automatique silencieuse via navigator.language
+const TRANSLATIONS = {"fr":{"title":"Coupe du Monde","year":"2026","info":"${matches} matchs joués • Données réelles au 22 juin 2026","frozen":"○ Données figées (mise à jour manuelle)","live_auto":"🟢 Auto-actualisation active (recharge 60s si matchs en cours)","hosts":"Canada · Mexique · États-Unis","live_title":"⚽ En direct","live_tag":"Matchs en cours — score live, déjà pris en compte (provisoire ●) dans le classement et la projection","groups_title":"Groupes","groups_tag":"Classement officiel FIFA : points › confrontation directe › différence de buts › buts marqués","tv_title":"📺 Diffusion du jour","tv_tag":"Programme du jour — heures de Paris (CEST) · diffuseurs indicatifs FR & MENA","thirds_title":"Top 8 des 3es","thirds_tag":"Les 8 meilleurs troisièmes complètent les 16es de finale","bracket_title":"16es de finale — projection","bracket_tag":"Les 32 qualifiés projetés à partir des classements actuels","bracket_banner":"⚡ <b>Projection automatique.</b> Chaque match des 16es est rempli avec les positions actuelles (1ers, 2es et 8 meilleurs 3es selon la répartition officielle FIFA). Le vainqueur probable de chaque affiche est surligné. Tout se recalcule à l'ajout de nouveaux résultats — les groupes ne sont pas terminés, c'est donc indicatif.","results_title":"Résultats","results_tag":"Journées 1 & 2","footer":"FIFA World Cup 2026 • Données officielles au 20 juin • Classement avec confrontation directe • Projection indicative"},"en":{"title":"World Cup","year":"2026","info":"${matches} matches played • Live data as of June 22, 2026","frozen":"○ Frozen data (manual update)","live_auto":"🟢 Auto-update active (refresh every 60s during live matches)","hosts":"Canada · Mexico · United States","live_title":"⚽ Live","live_tag":"Ongoing matches — live score, already counted (provisional ●) in standings and projections","groups_title":"Groups","groups_tag":"Official FIFA ranking: points › head-to-head › goal difference › goals scored","tv_title":"📺 Today's Schedule","tv_tag":"Today's program — Paris time (CEST) · broadcasters FR & MENA","thirds_title":"Top 8 Third-Place","thirds_tag":"The 8 best third-place teams complete the Round of 32","bracket_title":"Round of 32 — projection","bracket_tag":"32 qualified teams projected from current standings","bracket_banner":"⚡ <b>Automatic projection.</b> Each Round of 32 match is filled with current positions (1st, 2nd, and 8 best 3rd-place teams per official FIFA distribution). The likely winner of each matchup is highlighted. Everything recalculates as new results are added — groups are not complete yet, so this is indicative.","results_title":"Results","results_tag":"Days 1 & 2","footer":"FIFA World Cup 2026 • Official data as of June 20 • Ranking with head-to-head • Indicative projection"},"ar":{"title":"كأس العالم","year":"2026","info":"${matches} مباراة لعبت • بيانات حية اعتباراً من 22 يونيو 2026","frozen":"○ بيانات مجمدة (تحديث يدوي)","live_auto":"🟢 التحديث التلقائي نشط (تحديث كل 60 ثانية أثناء المباريات الحية)","hosts":"كندا · المكسيك · الولايات المتحدة","live_title":"⚽ البث المباشر","live_tag":"المباريات الجارية — نتيجة مباشرة، مُحتسبة بالفعل (مؤقت ●) في الترتيب والتوقعات","groups_title":"المجموعات","groups_tag":"ترتيب الفيفا الرسمي: النقاط › المواجهات المباشرة › فارق الأهداف › الأهداف","tv_title":"📺 برنامج اليوم","tv_tag":"برنامج اليوم — بتوقيت باريس (CEST) · البث FR & MENA","thirds_title":"أفضل 8 ثالثة","thirds_tag":"أفضل 8 فرق تحتل المركز الثالث تكمل دور الـ 32","bracket_title":"دور الـ 32 — توقع","bracket_tag":"32 فريقاً مؤهلاً معروضاً على أساس الترتيب الحالي","bracket_banner":"⚡ <b>توقع تلقائي.</b> تُملأ كل مباراة من دور الـ 32 بالمراكز الحالية (الأول والثاني و 8 أفضل فرق تحتل المركز الثالث حسب توزيع الفيفا الرسمي). يتم تمييز الفائز المحتمل في كل مواجهة. يتم إعادة حساب كل شيء مع إضافة نتائج جديدة — المجموعات لم تكتمل بعد، لذا هذا توقع.","results_title":"النتائج","results_tag":"اليوم 1 و 2","footer":"كأس العالم FIFA 2026 • البيانات الرسمية اعتباراً من 20 يونيو • ترتيب مع المواجهات المباشرة • توقع إرشادي"},"es":{"title":"Copa del Mundo","year":"2026","info":"${matches} partidos jugados • Datos en vivo al 22 de junio de 2026","frozen":"○ Datos congelados (actualización manual)","live_auto":"🟢 Actualización automática activa (actualización cada 60s durante partidos en vivo)","hosts":"Canadá · México · Estados Unidos","live_title":"⚽ En Vivo","live_tag":"Partidos en curso — marcador en vivo, ya contabilizado (provisional ●) en clasificación y proyecciones","groups_title":"Grupos","groups_tag":"Clasificación oficial FIFA: puntos › enfrentamientos directos › diferencia de goles › goles anotados","tv_title":"📺 Programación del Día","tv_tag":"Programa de hoy — hora de París (CEST) · retransmisores FR & MENA","thirds_title":"Top 8 Terceros Lugares","thirds_tag":"Los 8 mejores terceros lugares completan los Dieciseisavos de Final","bracket_title":"Dieciseisavos de Final — proyección","bracket_tag":"32 equipos clasificados proyectados a partir de clasificaciones actuales","bracket_banner":"⚡ <b>Proyección automática.</b> Cada partido de Dieciseisavos se completa con posiciones actuales (1º, 2º y 8 mejores terceros lugares según distribución oficial FIFA). El ganador probable de cada enfrentamiento está resaltado. Todo se recalcula con nuevos resultados — los grupos aún no están completos, por lo que esto es indicativo.","results_title":"Resultados","results_tag":"Días 1 y 2","footer":"Copa del Mundo FIFA 2026 • Datos oficiales al 20 de junio • Clasificación con enfrentamientos directos • Proyección indicativa"},"nl":{"title":"Wereldkampioenschap","year":"2026","info":"${matches} wedstrijden gespeeld • Live-gegevens per 22 juni 2026","frozen":"○ Bevroren gegevens (handmatige update)","live_auto":"🟢 Automatische update actief (elke 60s vernieuwen tijdens live-wedstrijden)","hosts":"Canada · Mexico · Verenigde Staten","live_title":"⚽ Live","live_tag":"Lopende wedstrijden — live score, al meegenomen (voorlopig ●) in klassement en projecties","groups_title":"Poules","groups_tag":"Officiële FIFA-ranking: punten › onderlinge resultaten › doelsaldo › gemaakte doelpunten","tv_title":"📺 Programma Vandaag","tv_tag":"Programma van vandaag — Parijse tijd (CEST) · omroepen FR & MENA","thirds_title":"Top 8 Derde Plaatsen","thirds_tag":"De 8 beste nummers 3 vullen de zestiende finales aan","bracket_title":"Zestiende Finales — projectie","bracket_tag":"32 gekwalificeerde teams geprojecteerd op basis van huidge ranglijst","bracket_banner":"⚡ <b>Automatische projectie.</b> Elke zestiende finale wordt ingevuld met huidpreposities (1e, 2e en 8 beste derde plaatsen volgens officiële FIFA-verdeling). De waarschijnlijke winnaar van elke ontmoeting is gemarkeerd. Alles wordt opnieuw berekend als nieuwe resultaten worden toegevoegd — poules zijn nog niet voltooid, dus dit is indicatief.","results_title":"Resultaten","results_tag":"Dag 1 en 2","footer":"FIFA Wereldkampioenschap 2026 • Officiële gegevens per 20 juni • Ranking met onderlinge resultaten • Indicatieve projectie"},"ja":{"title":"ワールドカップ","year":"2026","info":"${matches}試合実施 • 2026年6月22日現在のライブデータ","frozen":"○ フリーズされたデータ（手動更新）","live_auto":"🟢 自動更新が有効（ライブマッチ中は60秒ごとに更新）","hosts":"カナダ · メキシコ · アメリカ合衆国","live_title":"⚽ ライブ","live_tag":"進行中の試合 — ライブスコア、すでに計上（暫定 ●）されています","groups_title":"グループ","groups_tag":"FIFA公式ランキング：ポイント › 直接対決 › 得失点差 › 得点数","tv_title":"📺 本日の放送予定","tv_tag":"本日のプログラム — パリ時間（CEST） · 放送局 FR & MENA","thirds_title":"トップ8の3位","thirds_tag":"最高の8つの3位チームが32強を完成させる","bracket_title":"32強 — 予想","bracket_tag":"現在のランキングから予想される32チーム","bracket_banner":"⚡ <b>自動予想。</b> 各32強マッチは現在のポジション（1位、2位、FIFA公式配分による最高の8つの3位チーム）で埋められます。各マッチアップの可能性が高いウィナーがハイライトされています。新しい結果が追加されるとすべてが再計算されます — グループはまだ完了していないため、これは参考です。","results_title":"結果","results_tag":"日1と2","footer":"FIFA ワールドカップ 2026 • 6月20日現在の公式データ • 直接対決によるランキング • 参考予想"},"ko":{"title":"월드컵","year":"2026","info":"${matches}경기 진행됨 • 2026년 6월 22일 현재 라이브 데이터","frozen":"○ 고정된 데이터 (수동 업데이트)","live_auto":"🟢 자동 업데이트 활성화 (라이브 경기 중 60초마다 새로고침)","hosts":"캐나다 · 멕시코 · 미국","live_title":"⚽ 라이브","live_tag":"진행 중인 경기 — 라이브 스코어, 이미 계산됨 (임시 ●) 순위 및 예상에","groups_title":"조","groups_tag":"공식 FIFA 순위: 포인트 › 상호 전적 › 골 차이 › 득점","tv_title":"📺 오늘의 방송","tv_tag":"오늘의 프로그램 — 파리 시간 (CEST) · 방송국 FR & MENA","thirds_title":"3위 상위 8팀","thirds_tag":"상위 8개의 3위 팀이 32강을 완성합니다","bracket_title":"32강 — 예상","bracket_tag":"현재 순위에서 예상되는 32개 팀","bracket_banner":"⚡ <b>자동 예상.</b> 각 32강 경기는 현재 포지션(1위, 2위, FIFA 공식 배정에 따른 최고의 8개 3위팀)으로 채워집니다. 각 대결의 가능성 높은 승자가 강조 표시됩니다. 새 결과가 추가되면 모든 것이 재계산됩니다. 조는 아직 완료되지 않았으므로 이는 참고용입니다.","results_title":"결과","results_tag":"일 1과 2","footer":"FIFA 월드컵 2026 • 6월 20일 현재 공식 데이터 • 상호 전적이 포함된 순위 • 참고용 예상"}};
+const COUNTRIES = {"fr":{"MEX":"Mexique","KOR":"Corée du Sud","CZE":"Tchéquie","RSA":"Afrique du Sud","CAN":"Canada","SUI":"Suisse","BIH":"Bosnie","QAT":"Qatar","BRA":"Brésil","MAR":"Maroc","SCO":"Écosse","HTI":"Haïti","USA":"États-Unis","AUS":"Australie","PAR":"Paraguay","TUR":"Turquie","GER":"Allemagne","CIV":"Côte d'Ivoire","ECU":"Équateur","CUW":"Curaçao","NED":"Pays-Bas","SWE":"Suède","JPN":"Japon","TUN":"Tunisie","NZL":"Nouvelle-Zélande","IRN":"Iran","BEL":"Belgique","EGY":"Égypte","URU":"Uruguay","KSA":"Arabie saoudite","ESP":"Espagne","CPV":"Cap-Vert","NOR":"Norvège","FRA":"France","SEN":"Sénégal","IRQ":"Irak","ARG":"Argentine","AUT":"Autriche","JOR":"Jordanie","DZA":"Algérie","COL":"Colombie","COD":"RD Congo","POR":"Portugal","UZB":"Ouzbékistan","ENG":"Angleterre","GHA":"Ghana","PAN":"Panama","CRO":"Croatie"},"en":{"MEX":"Mexico","KOR":"South Korea","CZE":"Czechia","RSA":"South Africa","CAN":"Canada","SUI":"Switzerland","BIH":"Bosnia","QAT":"Qatar","BRA":"Brazil","MAR":"Morocco","SCO":"Scotland","HTI":"Haiti","USA":"United States","AUS":"Australia","PAR":"Paraguay","TUR":"Turkey","GER":"Germany","CIV":"Ivory Coast","ECU":"Ecuador","CUW":"Curaçao","NED":"Netherlands","SWE":"Sweden","JPN":"Japan","TUN":"Tunisia","NZL":"New Zealand","IRN":"Iran","BEL":"Belgium","EGY":"Egypt","URU":"Uruguay","KSA":"Saudi Arabia","ESP":"Spain","CPV":"Cape Verde","NOR":"Norway","FRA":"France","SEN":"Senegal","IRQ":"Iraq","ARG":"Argentina","AUT":"Austria","JOR":"Jordan","DZA":"Algeria","COL":"Colombia","COD":"DR Congo","POR":"Portugal","UZB":"Uzbekistan","ENG":"England","GHA":"Ghana","PAN":"Panama","CRO":"Croatia"},"ar":{"MEX":"المكسيك","KOR":"كوريا الجنوبية","CZE":"التشيك","RSA":"جنوب أفريقيا","CAN":"كندا","SUI":"سويسرا","BIH":"البوسنة","QAT":"قطر","BRA":"البرازيل","MAR":"المغرب","SCO":"اسكتلندا","HTI":"هايتي","USA":"الولايات المتحدة","AUS":"أستراليا","PAR":"باراغواي","TUR":"تركيا","GER":"ألمانيا","CIV":"ساحل العاج","ECU":"الإكوادور","CUW":"كوراساو","NED":"هولندا","SWE":"السويد","JPN":"اليابان","TUN":"تونس","NZL":"نيوزيلندا","IRN":"إيران","BEL":"بلجيكا","EGY":"مصر","URU":"الأوروغواي","KSA":"السعودية","ESP":"إسبانيا","CPV":"الرأس الأخضر","NOR":"النرويج","FRA":"فرنسا","SEN":"السنغال","IRQ":"العراق","ARG":"الأرجنتين","AUT":"النمسا","JOR":"الأردن","DZA":"الجزائر","COL":"كولومبيا","COD":"الكونغو الديمقراطية","POR":"البرتغال","UZB":"أوزبكستان","ENG":"إنجلترا","GHA":"غانا","PAN":"بنما","CRO":"كرواتيا"},"es":{"MEX":"México","KOR":"Corea del Sur","CZE":"Chequia","RSA":"Sudáfrica","CAN":"Canadá","SUI":"Suiza","BIH":"Bosnia","QAT":"Catar","BRA":"Brasil","MAR":"Marruecos","SCO":"Escocia","HTI":"Haití","USA":"Estados Unidos","AUS":"Australia","PAR":"Paraguay","TUR":"Turquía","GER":"Alemania","CIV":"Costa de Marfil","ECU":"Ecuador","CUW":"Curazao","NED":"Países Bajos","SWE":"Suecia","JPN":"Japón","TUN":"Túnez","NZL":"Nueva Zelanda","IRN":"Irán","BEL":"Bélgica","EGY":"Egipto","URU":"Uruguay","KSA":"Arabia Saudí","ESP":"España","CPV":"Cabo Verde","NOR":"Noruega","FRA":"Francia","SEN":"Senegal","IRQ":"Irak","ARG":"Argentina","AUT":"Austria","JOR":"Jordania","DZA":"Argelia","COL":"Colombia","COD":"RD Congo","POR":"Portugal","UZB":"Uzbekistán","ENG":"Inglaterra","GHA":"Ghana","PAN":"Panamá","CRO":"Croacia"},"nl":{"MEX":"Mexico","KOR":"Zuid-Korea","CZE":"Tsjechië","RSA":"Zuid-Afrika","CAN":"Canada","SUI":"Zwitserland","BIH":"Bosnië","QAT":"Qatar","BRA":"Brazilië","MAR":"Marokko","SCO":"Schotland","HTI":"Haïti","USA":"Verenigde Staten","AUS":"Australië","PAR":"Paraguay","TUR":"Turkije","GER":"Duitsland","CIV":"Ivoorkust","ECU":"Ecuador","CUW":"Curaçao","NED":"Nederland","SWE":"Zweden","JPN":"Japan","TUN":"Tunesië","NZL":"Nieuw-Zeeland","IRN":"Iran","BEL":"België","EGY":"Egypte","URU":"Uruguay","KSA":"Saoedi-Arabië","ESP":"Spanje","CPV":"Kaapverdië","NOR":"Noorwegen","FRA":"Frankrijk","SEN":"Senegal","IRQ":"Irak","ARG":"Argentinië","AUT":"Oostenrijk","JOR":"Jordanië","DZA":"Algerije","COL":"Colombia","COD":"DR Congo","POR":"Portugal","UZB":"Oezbekistan","ENG":"Engeland","GHA":"Ghana","PAN":"Panama","CRO":"Kroatië"},"ja":{"MEX":"メキシコ","KOR":"韓国","CZE":"チェコ","RSA":"南アフリカ","CAN":"カナダ","SUI":"スイス","BIH":"ボスニア","QAT":"カタール","BRA":"ブラジル","MAR":"モロッコ","SCO":"スコットランド","HTI":"ハイチ","USA":"アメリカ","AUS":"オーストラリア","PAR":"パラグアイ","TUR":"トルコ","GER":"ドイツ","CIV":"コートジボワール","ECU":"エクアドル","CUW":"キュラソー","NED":"オランダ","SWE":"スウェーデン","JPN":"日本","TUN":"チュニジア","NZL":"ニュージーランド","IRN":"イラン","BEL":"ベルギー","EGY":"エジプト","URU":"ウルグアイ","KSA":"サウジアラビア","ESP":"スペイン","CPV":"カーボベルデ","NOR":"ノルウェー","FRA":"フランス","SEN":"セネガル","IRQ":"イラク","ARG":"アルゼンチン","AUT":"オーストリア","JOR":"ヨルダン","DZA":"アルジェリア","COL":"コロンビア","COD":"DR コンゴ","POR":"ポルトガル","UZB":"ウズベキスタン","ENG":"イングランド","GHA":"ガーナ","PAN":"パナマ","CRO":"クロアチア"},"ko":{"MEX":"멕시코","KOR":"대한민국","CZE":"체코","RSA":"남아프리카","CAN":"캐나다","SUI":"스위스","BIH":"보스니아","QAT":"카타르","BRA":"브라질","MAR":"모로코","SCO":"스코틀랜드","HTI":"아이티","USA":"미국","AUS":"호주","PAR":"파라과이","TUR":"튀르키예","GER":"독일","CIV":"코트디부아르","ECU":"에콰도르","CUW":"퀴라소","NED":"네덜란드","SWE":"스웨덴","JPN":"일본","TUN":"튀니지","NZL":"뉴질랜드","IRN":"이란","BEL":"벨기에","EGY":"이집트","URU":"우루과이","KSA":"사우디아라비아","ESP":"스페인","CPV":"카보베르데","NOR":"노르웨이","FRA":"프랑스","SEN":"세네갈","IRQ":"이라크","ARG":"아르헨티나","AUT":"오스트리아","JOR":"요르단","DZA":"알제리","COL":"콜롬비아","COD":"DR 콩고","POR":"포르투갈","UZB":"우즈베키스탄","ENG":"잉글랜드","GHA":"가나","PAN":"파나마","CRO":"크로아티아"}};
+const UI = {"fr":{"group":"Groupe","matches_played":"matchs","team":"Équipe","mp":"J","w":"G","d":"N","l":"P","goals":"Buts","gd":"Diff","pts":"Pts","grp":"Gr","bp":"BP","status":"Statut","qualified":"qualifié","eliminated":"éliminé","winner_of":"Vainqueur M","r32":"16es","r16":"8es","qf":"Quarts","sf":"Demie","final":"FINALE","champion":"CHAMPION","live":"EN DIRECT","ht":"MI-TEMPS","live_data":"● Données live","live_count":"match(s) en cours","data_freeze":"○ Données figées","day_label":"Journée du","fairplay_note":"⚠️ Le 4e critère officiel FIFA (fair-play) est non disponible ici — les égalités parfaites peuvent différer légèrement de l'officiel. Groupes encore en cours : projection indicative.","validated":"✓ Validé"},"en":{"group":"Group","matches_played":"matches","team":"Team","mp":"P","w":"W","d":"D","l":"L","goals":"Goals","gd":"GD","pts":"Pts","grp":"Grp","bp":"GF","status":"Status","qualified":"qualified","eliminated":"eliminated","winner_of":"Winner M","r32":"R32","r16":"R16","qf":"QF","sf":"SF","final":"FINAL","champion":"CHAMPION","live":"LIVE","ht":"HALF-TIME","live_data":"● Live data","live_count":"match(es) ongoing","data_freeze":"○ Frozen data","day_label":"Day of","fairplay_note":"⚠️ FIFA's 4th official criterion (fair-play) is not available here — perfect ties may differ slightly from official. Groups still ongoing: indicative projection.","validated":"✓ Validated"},"ar":{"group":"مجموعة","matches_played":"مباريات","team":"الفريق","mp":"لعب","w":"فوز","d":"تعادل","l":"خسارة","goals":"أهداف","gd":"فارق","pts":"نقاط","grp":"مج","bp":"له","status":"الحالة","qualified":"متأهل","eliminated":"خارج","winner_of":"الفائز م","r32":"دور 32","r16":"دور 16","qf":"ربع النهائي","sf":"نصف النهائي","final":"النهائي","champion":"البطل","live":"مباشر","ht":"الشوط الأول","live_data":"● بيانات حية","live_count":"مباراة جارية","data_freeze":"○ بيانات مجمدة","day_label":"يوم","fairplay_note":"⚠️ المعيار الرابع الرسمي للفيفا (اللعب النظيف) غير متوفر هنا — قد تختلف التعادلات الكاملة قليلاً عن الرسمية. المجموعات لا تزال جارية: توقع إرشادي.","validated":"✓ مؤكد"},"es":{"group":"Grupo","matches_played":"partidos","team":"Equipo","mp":"PJ","w":"G","d":"E","l":"P","goals":"Goles","gd":"DG","pts":"Pts","grp":"Gr","bp":"GF","status":"Estado","qualified":"clasificado","eliminated":"eliminado","winner_of":"Ganador M","r32":"1/16","r16":"1/8","qf":"Cuartos","sf":"Semi","final":"FINAL","champion":"CAMPEÓN","live":"EN VIVO","ht":"DESCANSO","live_data":"● Datos en vivo","live_count":"partido(s) en curso","data_freeze":"○ Datos congelados","day_label":"Jornada del","fairplay_note":"⚠️ El 4º criterio oficial FIFA (fair-play) no está disponible aquí — los empates perfectos pueden diferir ligeramente. Grupos aún en curso: proyección indicativa.","validated":"✓ Validado"},"nl":{"group":"Groep","matches_played":"wedstrijden","team":"Team","mp":"GS","w":"W","d":"G","l":"V","goals":"Goals","gd":"DS","pts":"Pt","grp":"Gr","bp":"DV","status":"Status","qualified":"geplaatst","eliminated":"uitgeschakeld","winner_of":"Winnaar M","r32":"1/16","r16":"1/8","qf":"Kwart","sf":"Halve","final":"FINALE","champion":"KAMPIOEN","live":"LIVE","ht":"RUST","live_data":"● Live-gegevens","live_count":"wedstrijd(en) bezig","data_freeze":"○ Bevroren gegevens","day_label":"Dag van","fairplay_note":"⚠️ FIFA's 4e officiële criterium (fair-play) is hier niet beschikbaar — perfecte gelijken kunnen licht afwijken. Poules nog bezig: indicatieve projectie.","validated":"✓ Bevestigd"},"ja":{"group":"グループ","matches_played":"試合","team":"チーム","mp":"試","w":"勝","d":"分","l":"敗","goals":"得点","gd":"差","pts":"勝点","grp":"組","bp":"得","status":"状態","qualified":"突破","eliminated":"敗退","winner_of":"勝者M","r32":"32強","r16":"16強","qf":"準々決勝","sf":"準決勝","final":"決勝","champion":"優勝","live":"ライブ","ht":"ハーフタイム","live_data":"● ライブデータ","live_count":"試合進行中","data_freeze":"○ 固定データ","day_label":"の日","fairplay_note":"⚠️ FIFAの4番目の公式基準（フェアプレー）はここでは利用できません — 完全なタイは公式とは若干異なる場合があります。グループはまだ進行中：参考予想。","validated":"✓ 確定"},"ko":{"group":"조","matches_played":"경기","team":"팀","mp":"경","w":"승","d":"무","l":"패","goals":"득점","gd":"득실","pts":"승점","grp":"조","bp":"득","status":"상태","qualified":"진출","eliminated":"탈락","winner_of":"승자M","r32":"32강","r16":"16강","qf":"8강","sf":"4강","final":"결승","champion":"우승","live":"라이브","ht":"하프타임","live_data":"● 라이브 데이터","live_count":"경기 진행 중","data_freeze":"○ 고정 데이터","day_label":"의 날","fairplay_note":"⚠️ FIFA의 4번째 공식 기준(페어플레이)은 여기서 사용할 수 없습니다 — 완전한 동률은 공식과 약간 다를 수 있습니다. 조는 아직 진행 중: 참고 예상.","validated":"✓ 확정"}};
+
+function detectLang(){
+  const navLang = (navigator.language || navigator.userLanguage || 'fr').toLowerCase();
+  const supported = ['fr','en','ar','es','nl','ja','ko'];
+  for(const code of supported){
+    if(navLang.startsWith(code)) return code;
+  }
+  return 'fr';  // fallback
+}
+const currentLang = detectLang();
+
+// Appliquer la direction RTL pour l'arabe dès le chargement
+if(currentLang === 'ar'){
+  document.documentElement.lang = 'ar';
+  document.documentElement.dir = 'rtl';
+} else {
+  document.documentElement.lang = currentLang;
+}
+
+function t(key){
+  const trans = TRANSLATIONS[currentLang];
+  let val = trans[key] || (TRANSLATIONS.fr[key] || '?');
+  if(typeof val==='string' && val.includes('${matches}')) val = val.replace('${matches}', '40');
+  return val;
+}
+
+// Récupère le nom d'un pays dans la langue active
+function cn(code){
+  return (COUNTRIES[currentLang] && COUNTRIES[currentLang][code]) || COUNTRIES.fr[code] || code;
+}
+
+// Récupère un libellé UI court dans la langue active
+function ui(key){
+  return (UI[currentLang] && UI[currentLang][key]) || UI.fr[key] || key;
+}
+
+function updateUI(){
+  // Titres et textes statiques
+  document.getElementById('title-text').textContent = t('title');
+  document.getElementById('year-text').textContent = t('year');
+  document.getElementById('info-text').innerHTML = t('info');
+  document.getElementById('hosts-text').textContent = t('hosts');
+  
+  const badge = liveGames.length > 0 ? t('live_auto') : t('frozen');
+  document.getElementById('live-badge').textContent = badge;
+  
+  document.getElementById('live-title').textContent = t('live_title');
+  document.getElementById('live-tag').textContent = t('live_tag');
+  
+  document.getElementById('groups-title').textContent = t('groups_title');
+  document.getElementById('groups-tag').textContent = t('groups_tag');
+  
+  document.getElementById('tv-title').textContent = t('tv_title');
+  
+  document.getElementById('thirds-title').innerHTML = t('thirds_title');
+  document.getElementById('thirds-tag').textContent = t('thirds_tag');
+  
+  document.getElementById('bracket-title').innerHTML = t('bracket_title');
+  document.getElementById('bracket-tag').textContent = t('bracket_tag');
+  document.getElementById('bracket-banner').innerHTML = t('bracket_banner');
+  
+  document.getElementById('results-title').textContent = t('results_title');
+  document.getElementById('results-tag').textContent = t('results_tag');
+  
+  document.getElementById('footer-text').textContent = t('footer');
+}
+
+// Fair-play : 4e critère FIFA (saisie manuelle pour cas d'égalité parfaite, normalement vide)
+const FAIRPLAY = {};
 const st = {"MEX":{"t":"MEX","g":"A","w":2,"d":0,"l":0,"gf":3,"ga":0,"pts":6,"played":2,"h2h":{"RSA":{"gf":2,"ga":0},"KOR":{"gf":1,"ga":0}},"gd":3},"KOR":{"t":"KOR","g":"A","w":1,"d":0,"l":1,"gf":2,"ga":2,"pts":3,"played":2,"h2h":{"CZE":{"gf":2,"ga":1},"MEX":{"gf":0,"ga":1}},"gd":0},"CZE":{"t":"CZE","g":"A","w":0,"d":1,"l":1,"gf":2,"ga":3,"pts":1,"played":2,"h2h":{"KOR":{"gf":1,"ga":2},"RSA":{"gf":1,"ga":1}},"gd":-1},"RSA":{"t":"RSA","g":"A","w":0,"d":1,"l":1,"gf":1,"ga":3,"pts":1,"played":2,"h2h":{"MEX":{"gf":0,"ga":2},"CZE":{"gf":1,"ga":1}},"gd":-2},"CAN":{"t":"CAN","g":"B","w":1,"d":1,"l":0,"gf":7,"ga":1,"pts":4,"played":2,"h2h":{"BIH":{"gf":1,"ga":1},"QAT":{"gf":6,"ga":0}},"gd":6},"SUI":{"t":"SUI","g":"B","w":1,"d":1,"l":0,"gf":5,"ga":2,"pts":4,"played":2,"h2h":{"QAT":{"gf":1,"ga":1},"BIH":{"gf":4,"ga":1}},"gd":3},"BIH":{"t":"BIH","g":"B","w":0,"d":1,"l":1,"gf":2,"ga":5,"pts":1,"played":2,"h2h":{"CAN":{"gf":1,"ga":1},"SUI":{"gf":1,"ga":4}},"gd":-3},"QAT":{"t":"QAT","g":"B","w":0,"d":1,"l":1,"gf":1,"ga":7,"pts":1,"played":2,"h2h":{"SUI":{"gf":1,"ga":1},"CAN":{"gf":0,"ga":6}},"gd":-6},"BRA":{"t":"BRA","g":"C","w":1,"d":1,"l":0,"gf":4,"ga":1,"pts":4,"played":2,"h2h":{"MAR":{"gf":1,"ga":1},"HTI":{"gf":3,"ga":0}},"gd":3},"MAR":{"t":"MAR","g":"C","w":1,"d":1,"l":0,"gf":2,"ga":1,"pts":4,"played":2,"h2h":{"BRA":{"gf":1,"ga":1},"SCO":{"gf":1,"ga":0}},"gd":1},"SCO":{"t":"SCO","g":"C","w":1,"d":0,"l":1,"gf":1,"ga":1,"pts":3,"played":2,"h2h":{"HTI":{"gf":1,"ga":0},"MAR":{"gf":0,"ga":1}},"gd":0},"HTI":{"t":"HTI","g":"C","w":0,"d":0,"l":2,"gf":0,"ga":4,"pts":0,"played":2,"h2h":{"SCO":{"gf":0,"ga":1},"BRA":{"gf":0,"ga":3}},"gd":-4},"USA":{"t":"USA","g":"D","w":2,"d":0,"l":0,"gf":6,"ga":1,"pts":6,"played":2,"h2h":{"PAR":{"gf":4,"ga":1},"AUS":{"gf":2,"ga":0}},"gd":5},"AUS":{"t":"AUS","g":"D","w":1,"d":0,"l":1,"gf":2,"ga":2,"pts":3,"played":2,"h2h":{"TUR":{"gf":2,"ga":0},"USA":{"gf":0,"ga":2}},"gd":0},"PAR":{"t":"PAR","g":"D","w":1,"d":0,"l":1,"gf":2,"ga":4,"pts":3,"played":2,"h2h":{"USA":{"gf":1,"ga":4},"TUR":{"gf":1,"ga":0}},"gd":-2},"TUR":{"t":"TUR","g":"D","w":0,"d":0,"l":2,"gf":0,"ga":3,"pts":0,"played":2,"h2h":{"AUS":{"gf":0,"ga":2},"PAR":{"gf":0,"ga":1}},"gd":-3},"GER":{"t":"GER","g":"E","w":2,"d":0,"l":0,"gf":9,"ga":2,"pts":6,"played":2,"h2h":{"CUW":{"gf":7,"ga":1},"CIV":{"gf":2,"ga":1}},"gd":7},"CIV":{"t":"CIV","g":"E","w":1,"d":0,"l":1,"gf":2,"ga":2,"pts":3,"played":2,"h2h":{"ECU":{"gf":1,"ga":0},"GER":{"gf":1,"ga":2}},"gd":0},"ECU":{"t":"ECU","g":"E","w":0,"d":1,"l":1,"gf":0,"ga":1,"pts":1,"played":2,"h2h":{"CIV":{"gf":0,"ga":1},"CUW":{"gf":0,"ga":0}},"gd":-1},"CUW":{"t":"CUW","g":"E","w":0,"d":1,"l":1,"gf":1,"ga":7,"pts":1,"played":2,"h2h":{"GER":{"gf":1,"ga":7},"ECU":{"gf":0,"ga":0}},"gd":-6},"NED":{"t":"NED","g":"F","w":1,"d":1,"l":0,"gf":7,"ga":3,"pts":4,"played":2,"h2h":{"JPN":{"gf":2,"ga":2},"SWE":{"gf":5,"ga":1}},"gd":4},"SWE":{"t":"SWE","g":"F","w":1,"d":0,"l":1,"gf":6,"ga":6,"pts":3,"played":2,"h2h":{"TUN":{"gf":5,"ga":1},"NED":{"gf":1,"ga":5}},"gd":0},"JPN":{"t":"JPN","g":"F","w":1,"d":1,"l":0,"gf":6,"ga":2,"pts":4,"played":2,"h2h":{"NED":{"gf":2,"ga":2},"TUN":{"gf":4,"ga":0}},"gd":4},"TUN":{"t":"TUN","g":"F","w":0,"d":0,"l":2,"gf":1,"ga":9,"pts":0,"played":2,"h2h":{"SWE":{"gf":1,"ga":5},"JPN":{"gf":0,"ga":4}},"gd":-8},"NZL":{"t":"NZL","g":"G","w":0,"d":1,"l":1,"gf":3,"ga":5,"pts":1,"played":2,"h2h":{"IRN":{"gf":2,"ga":2},"EGY":{"gf":1,"ga":3}},"gd":-2},"IRN":{"t":"IRN","g":"G","w":0,"d":2,"l":0,"gf":2,"ga":2,"pts":2,"played":2,"h2h":{"NZL":{"gf":2,"ga":2},"BEL":{"gf":0,"ga":0}},"gd":0},"BEL":{"t":"BEL","g":"G","w":0,"d":2,"l":0,"gf":1,"ga":1,"pts":2,"played":2,"h2h":{"EGY":{"gf":1,"ga":1},"IRN":{"gf":0,"ga":0}},"gd":0},"EGY":{"t":"EGY","g":"G","w":1,"d":1,"l":0,"gf":4,"ga":2,"pts":4,"played":2,"h2h":{"BEL":{"gf":1,"ga":1},"NZL":{"gf":3,"ga":1}},"gd":2},"URU":{"t":"URU","g":"H","w":0,"d":2,"l":0,"gf":3,"ga":3,"pts":2,"played":2,"h2h":{"KSA":{"gf":1,"ga":1},"CPV":{"gf":2,"ga":2}},"gd":0},"KSA":{"t":"KSA","g":"H","w":0,"d":1,"l":1,"gf":1,"ga":5,"pts":1,"played":2,"h2h":{"URU":{"gf":1,"ga":1},"ESP":{"gf":0,"ga":4}},"gd":-4},"ESP":{"t":"ESP","g":"H","w":1,"d":1,"l":0,"gf":4,"ga":0,"pts":4,"played":2,"h2h":{"CPV":{"gf":0,"ga":0},"KSA":{"gf":4,"ga":0}},"gd":4},"CPV":{"t":"CPV","g":"H","w":0,"d":2,"l":0,"gf":2,"ga":2,"pts":2,"played":2,"h2h":{"ESP":{"gf":0,"ga":0},"URU":{"gf":2,"ga":2}},"gd":0},"NOR":{"t":"NOR","g":"I","w":1,"d":0,"l":0,"gf":4,"ga":1,"pts":3,"played":1,"h2h":{"IRQ":{"gf":4,"ga":1}},"gd":3},"FRA":{"t":"FRA","g":"I","w":1,"d":0,"l":0,"gf":3,"ga":1,"pts":3,"played":1,"h2h":{"SEN":{"gf":3,"ga":1}},"gd":2},"SEN":{"t":"SEN","g":"I","w":0,"d":0,"l":1,"gf":1,"ga":3,"pts":0,"played":1,"h2h":{"FRA":{"gf":1,"ga":3}},"gd":-2},"IRQ":{"t":"IRQ","g":"I","w":0,"d":0,"l":1,"gf":1,"ga":4,"pts":0,"played":1,"h2h":{"NOR":{"gf":1,"ga":4}},"gd":-3},"ARG":{"t":"ARG","g":"J","w":1,"d":0,"l":0,"gf":3,"ga":0,"pts":3,"played":1,"h2h":{"DZA":{"gf":3,"ga":0}},"gd":3},"AUT":{"t":"AUT","g":"J","w":1,"d":0,"l":0,"gf":3,"ga":1,"pts":3,"played":1,"h2h":{"JOR":{"gf":3,"ga":1}},"gd":2},"JOR":{"t":"JOR","g":"J","w":0,"d":0,"l":1,"gf":1,"ga":3,"pts":0,"played":1,"h2h":{"AUT":{"gf":1,"ga":3}},"gd":-2},"DZA":{"t":"DZA","g":"J","w":0,"d":0,"l":1,"gf":0,"ga":3,"pts":0,"played":1,"h2h":{"ARG":{"gf":0,"ga":3}},"gd":-3},"COL":{"t":"COL","g":"K","w":1,"d":0,"l":0,"gf":3,"ga":1,"pts":3,"played":1,"h2h":{"UZB":{"gf":3,"ga":1}},"gd":2},"COD":{"t":"COD","g":"K","w":0,"d":1,"l":0,"gf":1,"ga":1,"pts":1,"played":1,"h2h":{"POR":{"gf":1,"ga":1}},"gd":0},"POR":{"t":"POR","g":"K","w":0,"d":1,"l":0,"gf":1,"ga":1,"pts":1,"played":1,"h2h":{"COD":{"gf":1,"ga":1}},"gd":0},"UZB":{"t":"UZB","g":"K","w":0,"d":0,"l":1,"gf":1,"ga":3,"pts":0,"played":1,"h2h":{"COL":{"gf":1,"ga":3}},"gd":-2},"ENG":{"t":"ENG","g":"L","w":1,"d":0,"l":0,"gf":4,"ga":2,"pts":3,"played":1,"h2h":{"CRO":{"gf":4,"ga":2}},"gd":2},"GHA":{"t":"GHA","g":"L","w":1,"d":0,"l":0,"gf":1,"ga":0,"pts":3,"played":1,"h2h":{"PAN":{"gf":1,"ga":0}},"gd":1},"PAN":{"t":"PAN","g":"L","w":0,"d":0,"l":1,"gf":0,"ga":1,"pts":0,"played":1,"h2h":{"GHA":{"gf":0,"ga":1}},"gd":-1},"CRO":{"t":"CRO","g":"L","w":0,"d":0,"l":1,"gf":2,"ga":4,"pts":0,"played":1,"h2h":{"ENG":{"gf":2,"ga":4}},"gd":-2}};
 const matchData = [["MEX",2,"RSA",0],["KOR",2,"CZE",1],["CAN",1,"BIH",1],["USA",4,"PAR",1],["QAT",1,"SUI",1],["BRA",1,"MAR",1],["HTI",0,"SCO",1],["AUS",2,"TUR",0],["GER",7,"CUW",1],["NED",2,"JPN",2],["CIV",1,"ECU",0],["SWE",5,"TUN",1],["ESP",0,"CPV",0],["BEL",1,"EGY",1],["KSA",1,"URU",1],["IRN",2,"NZL",2],["FRA",3,"SEN",1],["IRQ",1,"NOR",4],["ARG",3,"DZA",0],["AUT",3,"JOR",1],["POR",1,"COD",1],["ENG",4,"CRO",2],["GHA",1,"PAN",0],["UZB",1,"COL",3],["CZE",1,"RSA",1],["SUI",4,"BIH",1],["CAN",6,"QAT",0],["MEX",1,"KOR",0],["USA",2,"AUS",0],["SCO",0,"MAR",1],["BRA",3,"HTI",0],["TUR",0,"PAR",1],["NED",5,"SWE",1],["GER",2,"CIV",1],["TUN",0,"JPN",4],["ECU",0,"CUW",0],["ESP",4,"KSA",0],["BEL",0,"IRN",0],["URU",2,"CPV",2],["NZL",1,"EGY",3]];
-const NAME = {MEX:"Mexique",KOR:"Corée du Sud",CZE:"Tchéquie",RSA:"Afrique du Sud",CAN:"Canada",SUI:"Suisse",BIH:"Bosnie",QAT:"Qatar",BRA:"Brésil",MAR:"Maroc",SCO:"Écosse",HTI:"Haïti",USA:"États-Unis",AUS:"Australie",PAR:"Paraguay",TUR:"Turquie",GER:"Allemagne",CIV:"Côte d'Ivoire",ECU:"Équateur",CUW:"Curaçao",NED:"Pays-Bas",SWE:"Suède",JPN:"Japon",TUN:"Tunisie",NZL:"Nouvelle-Zélande",IRN:"Iran",BEL:"Belgique",EGY:"Égypte",URU:"Uruguay",KSA:"Arabie saoudite",ESP:"Espagne",CPV:"Cap-Vert",NOR:"Norvège",FRA:"France",SEN:"Sénégal",IRQ:"Irak",ARG:"Argentine",AUT:"Autriche",JOR:"Jordanie",DZA:"Algérie",COL:"Colombie",COD:"RD Congo",POR:"Portugal",UZB:"Ouzbékistan",ENG:"Angleterre",GHA:"Ghana",PAN:"Panama",CRO:"Croatie"};
+const NAME = COUNTRIES.fr;  // alias pour les API helpers (mappings TLA)
+// Initialiser les noms d'équipes dans la langue détectée
+Object.keys(st).forEach(k=>{ if(st[k]) st[k].name = cn(k); });
 const FLAG = {MEX:"🇲🇽",KOR:"🇰🇷",CZE:"🇨🇿",RSA:"🇿🇦",CAN:"🇨🇦",SUI:"🇨🇭",BIH:"🇧🇦",QAT:"🇶🇦",BRA:"🇧🇷",MAR:"🇲🇦",SCO:"🏴󠁧󠁢󠁳󠁣󠁴󠁿",HTI:"🇭🇹",USA:"🇺🇸",AUS:"🇦🇺",PAR:"🇵🇾",TUR:"🇹🇷",GER:"🇩🇪",CIV:"🇨🇮",ECU:"🇪🇨",CUW:"🇨🇼",NED:"🇳🇱",SWE:"🇸🇪",JPN:"🇯🇵",TUN:"🇹🇳",NZL:"🇳🇿",IRN:"🇮🇷",BEL:"🇧🇪",EGY:"🇪🇬",URU:"🇺🇾",KSA:"🇸🇦",ESP:"🇪🇸",CPV:"🇨🇻",NOR:"🇳🇴",FRA:"🇫🇷",SEN:"🇸🇳",IRQ:"🇮🇶",ARG:"🇦🇷",AUT:"🇦🇹",JOR:"🇯🇴",DZA:"🇩🇿",COL:"🇨🇴",COD:"🇨🇩",POR:"🇵🇹",UZB:"🇺🇿",ENG:"🏴󠁧󠁢󠁥󠁮󠁧󠁿",GHA:"🇬🇭",PAN:"🇵🇦",CRO:"🇭🇷"};
 
 
@@ -229,7 +306,7 @@ async function tryLive(){
     if(rebuilt.st){
       for(const k in st) delete st[k];
       Object.assign(st, rebuilt.st);
-      Object.keys(st).forEach(k=>{ st[k].name=NAME[k]; st[k].flag=FLAG[k]; });
+      Object.keys(st).forEach(k=>{ st[k].name=cn(k); st[k].flag=FLAG[k]; });
       matchData.length=0; rebuilt.matches.forEach(m=>matchData.push(m));
     }
     // succès si on a soit un classement live, soit des matchs en cours à afficher
@@ -253,35 +330,36 @@ clearAll();
   if(!liveGames || !liveGames.length){ wrap.style.display='none'; return; }
   wrap.style.display='';
   el.innerHTML = liveGames.map(g=>{
-    const lbl = g.status==='PAUSED' ? 'MI-TEMPS' : 'EN DIRECT';
+    const lbl = g.status==='PAUSED' ? ui('ht') : ui('live');
     return '<div class="m" style="border-color:rgba(255,90,90,.45);flex-direction:column;align-items:stretch;gap:6px;">'
       + '<div style="text-align:center;font-size:10px;color:#ff5a5a;font-weight:700;letter-spacing:.06em;">● '+lbl+'</div>'
       + '<div style="display:flex;align-items:center;gap:8px;">'
-      + '<span class="s"><span class="f">'+flagImg(g.h)+'</span><span>'+(NAME[g.h]||g.h)+'</span></span>'
+      + '<span class="s"><span class="f">'+flagImg(g.h)+'</span><span>'+cn(g.h)+'</span></span>'
       + '<span class="c"><span style="color:var(--text)">'+g.hs+'</span> – <span style="color:var(--text)">'+g.as+'</span></span>'
-      + '<span class="s a"><span class="f">'+flagImg(g.a)+'</span><span>'+(NAME[g.a]||g.a)+'</span></span>'
+      + '<span class="s a"><span class="f">'+flagImg(g.a)+'</span><span>'+cn(g.a)+'</span></span>'
       + '</div></div>';
   }).join('');
 })();
 
 
 function h2hStats(teams){const m={};teams.forEach(t=>m[t.t]={pts:0,gf:0,ga:0});teams.forEach(t=>teams.forEach(o=>{if(t.t!==o.t){const r=t.h2h[o.t];if(r){m[t.t].gf+=r.gf;m[t.t].ga+=r.ga;if(r.gf>r.ga)m[t.t].pts+=3;else if(r.gf===r.ga)m[t.t].pts+=1;}}}));Object.keys(m).forEach(k=>m[k].gd=m[k].gf-m[k].ga);return m;}
-function fifaOrder(g){let a=[...g].sort((x,y)=>y.pts-x.pts);const o=[];let i=0;while(i<a.length){let j=i;while(j<a.length&&a[j].pts===a[i].pts)j++;let t=a.slice(i,j);if(t.length>1){const h=h2hStats(t);t.sort((x,y)=>{if(h[y.t].pts!==h[x.t].pts)return h[y.t].pts-h[x.t].pts;if(h[y.t].gd!==h[x.t].gd)return h[y.t].gd-h[x.t].gd;if(h[y.t].gf!==h[x.t].gf)return h[y.t].gf-h[x.t].gf;if(y.gd!==x.gd)return y.gd-x.gd;if(y.gf!==x.gf)return y.gf-x.gf;return x.name.localeCompare(y.name);});}o.push(...t);i=j;}return o;}
+function fifaOrder(g){let a=[...g].sort((x,y)=>y.pts-x.pts);const o=[];let i=0;while(i<a.length){let j=i;while(j<a.length&&a[j].pts===a[i].pts)j++;let t=a.slice(i,j);if(t.length>1){const h=h2hStats(t);t.sort((x,y)=>{if(h[y.t].pts!==h[x.t].pts)return h[y.t].pts-h[x.t].pts;if(h[y.t].gd!==h[x.t].gd)return h[y.t].gd-h[x.t].gd;if(h[y.t].gf!==h[x.t].gf)return h[y.t].gf-h[x.t].gf;if(y.gd!==x.gd)return y.gd-x.gd;if(y.gf!==x.gf)return y.gf-x.gf;const fp_x=(FAIRPLAY[x.t]||0);const fp_y=(FAIRPLAY[y.t]||0);if(fp_y!==fp_x)return fp_y-fp_x;return x.name.localeCompare(y.name);});}o.push(...t);i=j;}return o;}
 
 const grp={};Object.values(st).forEach(s=>{(grp[s.g]=grp[s.g]||[]).push(s);});
 Object.keys(grp).forEach(g=>{grp[g]=fifaOrder(grp[g]);});
 
 // ---- GROUPES ----
 const gc=document.getElementById('groups');
-Object.keys(grp).sort().forEach(g=>{const a=grp[g];const p=a.reduce((s,x)=>s+x.played,0)/2;let rows='';a.forEach((x,i)=>{const q=i<2?'q1':(i===2?'q3':'');const d=(x.gd>0?'+':'')+x.gd;rows+=`<tr class="${q}"><td class="rk">${i+1}</td><td class="l"><span class="tm"><span class="f">${x.flag}</span>${x.name}${(x.liveCodes&&x.liveCodes.length)?' <span title="résultat en cours, provisoire" style="color:#ff5a5a;font-size:9px;vertical-align:middle;">●</span>':''}</span></td><td>${x.played}</td><td>${x.w}</td><td>${x.d}</td><td>${x.l}</td><td>${x.gf}:${x.ga}</td><td class="${x.gd>0?'gdp':'gdn'}">${d}</td><td class="pts">${x.pts}</td></tr>`;});gc.innerHTML+=`<div class="grp"><div class="grp-h"><span>Groupe ${g}</span><span class="gj">${p}/6 matchs</span></div><table><thead><tr><th></th><th class="l">Équipe</th><th>J</th><th>G</th><th>N</th><th>P</th><th>Buts</th><th>Diff</th><th>Pts</th></tr></thead><tbody>${rows}</tbody></table></div>`;});
+Object.keys(grp).sort().forEach(g=>{const a=grp[g];const p=a.reduce((s,x)=>s+x.played,0)/2;let rows='';a.forEach((x,i)=>{const q=i<2?'q1':(i===2?'q3':'');const d=(x.gd>0?'+':'')+x.gd;rows+=`<tr class="${q}"><td class="rk">${i+1}</td><td class="l"><span class="tm"><span class="f">${x.flag}</span>${cn(x.t)}${(x.liveCodes&&x.liveCodes.length)?' <span title="résultat en cours, provisoire" style="color:#ff5a5a;font-size:9px;vertical-align:middle;">●</span>':''}</span></td><td>${x.played}</td><td>${x.w}</td><td>${x.d}</td><td>${x.l}</td><td>${x.gf}:${x.ga}</td><td class="${x.gd>0?'gdp':'gdn'}">${d}</td><td class="pts">${x.pts}</td></tr>`;});gc.innerHTML+=`<div class="grp"><div class="grp-h"><span>${ui('group')} ${g}</span><span class="gj">${p}/6 ${ui('matches_played')}</span></div><table><thead><tr><th></th><th class="l">${ui('team')}</th><th>${ui('mp')}</th><th>${ui('w')}</th><th>${ui('d')}</th><th>${ui('l')}</th><th>${ui('goals')}</th><th>${ui('gd')}</th><th>${ui('pts')}</th></tr></thead><tbody>${rows}</tbody></table></div>`;});
 
 // ---- TOP 8 DES 3es ----
 const thirds=[];Object.keys(grp).forEach(g=>{if(grp[g][2])thirds.push({...grp[g][2],gr:g});});
-thirds.sort((a,b)=>b.pts!==a.pts?b.pts-a.pts:(b.gd!==a.gd?b.gd-a.gd:(b.gf!==a.gf?b.gf-a.gf:a.name.localeCompare(b.name))));
+thirds.sort((a,b)=>b.pts!==a.pts?b.pts-a.pts:(b.gd!==a.gd?b.gd-a.gd:(b.gf!==a.gf?b.gf-a.gf:((FAIRPLAY[b.t]||0)!==(FAIRPLAY[a.t]||0)?(FAIRPLAY[b.t]||0)-(FAIRPLAY[a.t]||0):a.name.localeCompare(b.name)))));
+
 const qualifiedThirds=thirds.slice(0,8);
 const te=document.getElementById('thirds');
-let trows='';thirds.forEach((x,i)=>{const q=i<8;const d=(x.gd>0?'+':'')+x.gd;trows+=`<tr class="${q?'q1':'elim'}"><td class="rk">${i+1}</td><td class="l"><span class="tm"><span class="f">${x.flag}</span>${x.name}</span></td><td>${x.gr}</td><td>${x.played}</td><td>${x.pts}</td><td class="${x.gd>0?'gdp':'gdn'}">${d}</td><td>${x.gf}</td><td>${q?'<span style="color:var(--green);font-weight:600">✓ Qualifié</span>':'<span style="color:var(--dim)">Éliminé</span>'}</td></tr>`;});
-te.innerHTML=`<table><thead><tr><th></th><th class="l">Équipe</th><th>Gr</th><th>J</th><th>Pts</th><th>Diff</th><th>BP</th><th>Statut</th></tr></thead><tbody>${trows}</tbody></table><div class="note">⚠️ Le 4<sup>e</sup> critère officiel FIFA est le score de fair-play (cartons), non disponible ici — le classement des égalités parfaites peut différer légèrement de l'officiel. Groupes encore en cours : projection indicative.</div>`;
+let trows='';thirds.forEach((x,i)=>{const q=i<8;const d=(x.gd>0?'+':'')+x.gd;trows+=`<tr class="${q?'q1':'elim'}"><td class="rk">${i+1}</td><td class="l"><span class="tm"><span class="f">${x.flag}</span>${cn(x.t)}</span></td><td>${x.gr}</td><td>${x.played}</td><td>${x.pts}</td><td class="${x.gd>0?'gdp':'gdn'}">${d}</td><td>${x.gf}</td><td>${q?'<span style="color:var(--green);font-weight:600">✓ '+ui('qualified')+'</span>':'<span style="color:var(--dim)">'+ui('eliminated')+'</span>'}</td></tr>`;});
+te.innerHTML=`<table><thead><tr><th></th><th class="l">${ui('team')}</th><th>${ui('grp')}</th><th>${ui('mp')}</th><th>${ui('pts')}</th><th>${ui('gd')}</th><th>${ui('bp')}</th><th>${ui('status')}</th></tr></thead><tbody>${trows}</tbody></table><div class="note">${ui('fairplay_note')}</div>`;
 
 // ---- BRACKET PROJETÉ ----
 // Comparateur de force d'une équipe (pour projeter les vainqueurs)
@@ -451,8 +529,8 @@ function tieValidated(m){ return teamOfficial(m.tA) && teamOfficial(m.tB); }
 // Rendu d'une case (réutilisé pour tous les tours)
 function teamRow(team,label,isWin,pct){
   const pctHtml = (pct!=null) ? `<span class="pct">${pct}%</span>` : '';
-  if(team) return `<div class="r ${isWin?'win':'lose'}"><span class="f">${team.flag}</span><span class="nm">${team.name}</span>${pctHtml}</div>`;
-  return `<div class="r"><span class="nm" style="color:var(--dim)">${label||"à déterminer"}</span>${pctHtml}</div>`;
+  if(team) return `<div class="r ${isWin?'win':'lose'}"><span class="f">${team.flag}</span><span class="nm">${cn(team.t)}</span>${pctHtml}</div>`;
+  return `<div class="r"><span class="nm" style="color:var(--dim)">${label||"—"}</span>${pctHtml}</div>`;
 }
 function tieBox(m,labelA,labelB,extra){
   const isR32 = !!R32_SCHED[m.n];
@@ -465,12 +543,17 @@ function tieBox(m,labelA,labelB,extra){
   const probs = probaMatch(m.tA,m.tB);
   const pA = probs? probs[0] : null;
   const pB = probs? probs[1] : null;
-  const valid = (s && tieValidated(m)) ? '<span class="valid">✓ Validé</span>' : '';
+  const valid = (s && tieValidated(m)) ? '<span class="valid">'+ui('validated')+'</span>' : '';
   const headLeft = s ? ('M'+m.n+' · '+s.city) : ('M'+m.n);
   const headRight = valid || (s? '<span class="seedlbl">'+s.d+'</span>' : '');
   const head=`<div class="mn"><span>${headLeft}</span>${headRight}</div>`;
   const foot=s?`<div class="kotime">🕒 ${s.t} <span class="tz">Paris</span></div>`:'';
-  return `<div class="tie ${extra||''} ${(s&&tieValidated(m))?'is-valid':''}">${head}${teamRow(m.tA,labelA,wA,pA)}${teamRow(m.tB,labelB,wB,pB)}${foot}</div>`;
+  // Re-traduit les libellés "Vainqueur Mxx" / "1er X" / "2e X" à la volée
+  const trLabel = (lbl)=>{
+    if(!lbl) return lbl;
+    return lbl.replace(/Vainqueur M/g, ui('winner_of'));
+  };
+  return `<div class="tie ${extra||''} ${(s&&tieValidated(m))?'is-valid':''}">${head}${teamRow(m.tA,trLabel(labelA),wA,pA)}${teamRow(m.tB,trLabel(labelB),wB,pB)}${foot}</div>`;
 }
 
 // ===== BRACKET MIROIR (façon "Road to the Final") =====
@@ -503,22 +586,22 @@ function col(title, nums, mapObj, isR32){
 const champ = (FN.tA && FN.tB) ? better(FN.tA,FN.tB) : null;
 const centerHtml = `
   <div class="bcol bcenter">
-    <div class="bcol-t">Finale</div>
+    <div class="bcol-t">${ui('final')}</div>
     ${tieBox(FN, FN.la, FN.lb)}
-    <div class="trophy"><div class="ic">🏆</div><div class="lb">Champion projeté</div><div class="champ">${champ?champ.flag+' '+champ.name:'—'}</div></div>
+    <div class="trophy"><div class="ic">🏆</div><div class="lb">${ui('champion')}</div><div class="champ">${champ?champ.flag+' '+cn(champ.t):'—'}</div></div>
   </div>`;
 
 const br=document.getElementById('bracket');
 br.innerHTML =
-  col('16es', L16, r32map, true) +
-  col('8es', L8, r16map, false) +
-  col('Quarts', L4, qfmap, false) +
-  col('Demie', L2, sfmap, false) +
+  col(ui('r32'), L16, r32map, true) +
+  col(ui('r16'), L8, r16map, false) +
+  col(ui('qf'), L4, qfmap, false) +
+  col(ui('sf'), L2, sfmap, false) +
   centerHtml +
-  col('Demie', R2, sfmap, false) +
-  col('Quarts', R4, qfmap, false) +
-  col('8es', R8, r16map, false) +
-  col('16es', R16x, r32map, true);
+  col(ui('sf'), R2, sfmap, false) +
+  col(ui('qf'), R4, qfmap, false) +
+  col(ui('r16'), R8, r16map, false) +
+  col(ui('r32'), R16x, r32map, true);
 
 
 // ---- DIFFUSION DU JOUR (dynamique, depuis l'API) ----
@@ -533,52 +616,49 @@ function broadcastFor(homeCode, awayCode){
 function renderTV(){
   const tvEl=document.getElementById('tv'); if(!tvEl) return;
   const tag=document.getElementById('tv-tag');
-  // "Journée de compétition" : on se cale sur l'heure de l'Est US (America/New_York),
-  // là où se jouent la plupart des matchs. Ainsi les matchs d'une même soirée américaine
-  // restent groupés, même ceux qui finissent après minuit en Europe.
+  // "Journée de compétition" : on se cale sur l'heure de l'Est US (America/New_York)
   const now=new Date();
-  const compDay = now.toLocaleDateString('fr-CA',{timeZone:'America/New_York'}); // AAAA-MM-JJ (jour US)
-  // Filtrer les fixtures de la journée de compétition
+  const compDay = now.toLocaleDateString('fr-CA',{timeZone:'America/New_York'});
   let today = (allFixtures||[]).filter(f=>{
     if(!f.date) return false;
     const d=new Date(f.date).toLocaleDateString('fr-CA',{timeZone:'America/New_York'});
     return d===compDay;
   });
-  // Ne garder que les équipes connues (codes mappés)
   today = today.map(f=>{
     const hc=tlaCode(f.homeTla)||apiCode(f.home), ac=tlaCode(f.awayTla)||apiCode(f.away);
     return {...f, hc, ac};
   }).filter(f=>f.hc && f.ac && NAME[f.hc] && NAME[f.ac]);
   today.sort((a,b)=> new Date(a.date)-new Date(b.date));
 
-  // Libellé : la journée de compétition US, mais on précise les dates Paris si ça déborde sur 2 jours
-  const usLabel = now.toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long',timeZone:'America/New_York'});
-  if(tag) tag.textContent = 'Journée du '+usLabel+' — heures de Paris (CEST) & Maroc · diffuseurs indicatifs FR & MENA';
+  // Mapping langue → locale BCP-47 pour formatage de date
+  const localeMap = {fr:'fr-FR',en:'en-US',ar:'ar-MA',es:'es-ES',nl:'nl-NL',ja:'ja-JP',ko:'ko-KR'};
+  const loc = localeMap[currentLang] || 'fr-FR';
+  const usLabel = now.toLocaleDateString(loc,{weekday:'long',day:'numeric',month:'long',timeZone:'America/New_York'});
+  if(tag) tag.textContent = ui('day_label')+' '+usLabel;
 
   if(!today.length){
-    tvEl.innerHTML='<div style="padding:18px;color:var(--dim);font-size:13px;">Aucun match de Coupe du Monde sur cette journée de compétition.</div>';
+    tvEl.innerHTML='<div style="padding:18px;color:var(--dim);font-size:13px;">—</div>';
     return;
   }
   tvEl.innerHTML = today.map(f=>{
     const dt = new Date(f.date);
     const hPar = dt.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',timeZone:'Europe/Paris'});
     const hMar = dt.toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit',timeZone:'Africa/Casablanca'});
-    // Jour de Paris du match vs jour de compétition US : si différent, on annote (ex. match à 2h = lendemain en Europe)
     const parisDay = dt.toLocaleDateString('fr-CA',{timeZone:'Europe/Paris'});
-    const parisDow = dt.toLocaleDateString('fr-FR',{weekday:'short',timeZone:'Europe/Paris'}).replace('.','');
+    const parisDow = dt.toLocaleDateString(loc,{weekday:'short',timeZone:'Europe/Paris'}).replace('.','');
     const overnight = (parisDay !== compDay);
     const hParLabel = hPar + (overnight ? ' <span style="color:var(--dim);font-size:10px;">'+parisDow+'</span>' : '');
     const done = f.status==='FINISHED';
     const live = f.status==='IN_PLAY' || f.status==='PAUSED';
     const cls = done?'done':(live?'live':'');
     let badge='';
-    if(done) badge='<span class="badge-done">Terminé · '+(f.homeGoals!=null?f.homeGoals+' – '+f.awayGoals:'')+'</span>';
-    else if(live) badge='<span class="badge-live">● '+(f.status==='PAUSED'?'MI-TEMPS':'EN DIRECT')+(f.homeGoals!=null?' '+f.homeGoals+'-'+f.awayGoals:'')+'</span>';
+    if(done) badge='<span class="badge-done">'+(f.homeGoals!=null?f.homeGoals+' – '+f.awayGoals:'')+'</span>';
+    else if(live) badge='<span class="badge-live">● '+(f.status==='PAUSED'?ui('ht'):ui('live'))+(f.homeGoals!=null?' '+f.homeGoals+'-'+f.awayGoals:'')+'</span>';
     const b=broadcastFor(f.hc,f.ac);
-    const frChips=b.fr.map(c=>'<span class="chip '+(c.clear?'clear':'')+'">'+flagImg('FRA',12)+' '+c.n+(c.clear?' (clair)':'')+'</span>').join('');
+    const frChips=b.fr.map(c=>'<span class="chip '+(c.clear?'clear':'')+'">'+flagImg('FRA',12)+' '+c.n+'</span>').join('');
     const menaChips=b.mena.map(c=>'<span class="chip maroc">'+flagImg('MAR',12)+' '+c.n+'</span>').join('');
     return '<div class="tvc '+cls+'">'
-      + '<div class="top"><span class="match">'+flagImg(f.hc)+' '+NAME[f.hc]+' <span style="color:var(--dim)">v</span> '+NAME[f.ac]+' '+flagImg(f.ac)+'</span>'
+      + '<div class="top"><span class="match">'+flagImg(f.hc)+' '+cn(f.hc)+' <span style="color:var(--dim)">v</span> '+cn(f.ac)+' '+flagImg(f.ac)+'</span>'
       + '<span class="hr">'+hParLabel+'</span></div>'
       + '<div class="gr">'+flagImg('MAR',11)+' '+hMar+(badge?' · '+badge:'')+'</div>'
       + '<div class="ch">'+frChips+menaChips+'</div></div>';
@@ -588,7 +668,7 @@ renderTV();
 
 // ---- RÉSULTATS ----
 const me=document.getElementById('matches');
-matchData.forEach(m=>{const h=NAME[m[0]],a=NAME[m[2]],hf=flagImg(m[0]),af=flagImg(m[2]);const hw=m[1]>m[3],dr=m[1]===m[3];me.innerHTML+=`<div class="m"><span class="s"><span class="f">${hf}</span><span class="${hw?'w':'l'}">${h}</span></span><span class="c"><span class="${hw?'w':'l'}">${m[1]}</span> – <span class="${!hw&&!dr?'w':'l'}">${m[3]}</span></span><span class="s a"><span class="f">${af}</span><span class="${!hw&&!dr?'w':'l'}">${a}</span></span></div>`;});
+matchData.forEach(m=>{const h=cn(m[0]),a=cn(m[2]),hf=flagImg(m[0]),af=flagImg(m[2]);const hw=m[1]>m[3],dr=m[1]===m[3];me.innerHTML+=`<div class="m"><span class="s"><span class="f">${hf}</span><span class="${hw?'w':'l'}">${h}</span></span><span class="c"><span class="${hw?'w':'l'}">${m[1]}</span> – <span class="${!hw&&!dr?'w':'l'}">${m[3]}</span></span><span class="s a"><span class="f">${af}</span><span class="${!hw&&!dr?'w':'l'}">${a}</span></span></div>`;});
 
 } // fin renderAll
 
@@ -599,7 +679,7 @@ function refreshLive(){
     if(ok){
       renderAll();
       const b=document.getElementById('live-badge');
-      if(b) b.textContent = liveGames.length ? ('● Données live — '+liveGames.length+' match(s) en cours') : '● Données live (API)';
+      if(b) b.textContent = liveGames.length ? (ui('live_data')+' — '+liveGames.length+' '+ui('live_count')) : ui('live_data');
     }
     // Re-sonder : toutes les 60 s s'il y a du live, sinon toutes les 5 min
     const next = (liveGames && liveGames.length) ? 60000 : 300000;
@@ -607,6 +687,10 @@ function refreshLive(){
   });
 }
 refreshLive();
+
+// ===== INITIALISATION MULTILINGUE =====
+// La langue est détectée automatiquement au chargement via navigator.language
+updateUI();
 
 </script>
 </body>
