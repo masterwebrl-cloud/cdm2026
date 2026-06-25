@@ -61,12 +61,19 @@ tr.q3 .rk{color:var(--gold);font-weight:700;}
 /* BRACKET */
 .proj-banner{background:linear-gradient(90deg,rgba(232,184,75,.12),transparent);border:1px solid var(--gold-soft);border-left:3px solid var(--gold);border-radius:8px;padding:11px 14px;font-size:12.5px;color:var(--muted);margin-bottom:18px;}
 .proj-banner b{color:var(--gold);}
-.bracket{display:grid;grid-template-columns:repeat(auto-fill,minmax(280px,1fr));gap:10px;}
+.bracket{display:flex;align-items:stretch;gap:6px;min-width:1700px;}
+.bcol{display:flex;flex-direction:column;justify-content:space-around;flex:1;min-width:150px;gap:6px;}
+.bcol.bcenter{justify-content:center;min-width:190px;}
+.bcol-t{font-family:"Barlow Condensed",sans-serif;font-weight:600;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);text-align:center;margin-bottom:6px;}
+.tie.is-valid{border-color:var(--green);box-shadow:0 0 0 1px rgba(78,199,127,.3);}
+.valid{font-size:9px;color:var(--green);font-weight:700;letter-spacing:.04em;text-transform:uppercase;}
 .tie{background:linear-gradient(180deg,var(--panel),#0e131c);border:1px solid var(--line);border-radius:10px;margin:0;overflow:hidden;}
 .tie .r{display:flex;align-items:center;gap:7px;padding:9px 12px;font-size:13px;}
 .tie .r+.r{border-top:1px solid var(--line-soft);}
 .tie .r .f{font-size:13px;}
 .tie .r .nm{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.tie .r .pct{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:12px;color:var(--muted);margin-left:6px;min-width:32px;text-align:right;}
+.tie .r.win .pct{color:var(--green);}
 .tie .r.win .nm{color:var(--green);font-weight:600;}
 .tie .r.lose .nm{color:var(--dim);}
 .tie .r .seed{font-size:9px;color:var(--dim);text-transform:uppercase;}
@@ -108,7 +115,7 @@ footer{text-align:center;font-size:11px;color:var(--dim);margin-top:44px;padding
 <h2>16<sup>es</sup> de finale — projection</h2>
 <div class="sec-tag">Les 32 qualifiés projetés à partir des classements actuels</div>
 <div class="proj-banner">⚡ <b>Projection automatique.</b> Chaque match des 16es est rempli avec les positions actuelles (1ers, 2es et 8 meilleurs 3es selon la répartition officielle FIFA). Le vainqueur probable de chaque affiche est surligné. Tout se recalcule à l'ajout de nouveaux résultats — les groupes ne sont pas terminés, c'est donc indicatif.</div>
-<div class="bracket" id="bracket"></div>
+<div style="overflow-x:auto;padding-bottom:14px;-webkit-overflow-scrolling:touch;"><div class="bracket" id="bracket"></div></div>
 
 <h2>Résultats</h2>
 <div class="sec-tag">Journées 1 & 2</div>
@@ -279,6 +286,44 @@ te.innerHTML=`<table><thead><tr><th></th><th class="l">Équipe</th><th>Gr</th><t
 function strength(t){ return t.pts*1000 + t.gd*10 + t.gf; }
 function better(a,b){ if(!a)return b; if(!b)return a; return strength(a)>=strength(b)?a:b; }
 
+// ===== MODÈLE DE PROBABILITÉ (rationnel, basé sur l'évolution des résultats) =====
+// 1) Indice de forme par match joué : points + 0.5*diff + 0.25*buts marqués
+function formeIndex(t){
+  if(!t || !t.played) return 0;
+  return (t.pts + 0.5*t.gd + 0.25*t.gf) / t.played;
+}
+// 2) Proba brute logistique sur l'écart de forme (k règle la sensibilité)
+function probBrute(a,b){
+  const k=0.9;
+  const fa=formeIndex(a), fb=formeIndex(b);
+  return 1/(1+Math.exp(-k*(fa-fb))); // 0..1, =0.5 si forme égale
+}
+// 3) Confiance = avancement des 2 groupes concernés (0 -> 1). 6 matchs par groupe.
+function confiance(a,b){
+  if(!a||!b) return 0;
+  const ga=a.g, gb=b.g;
+  const played = (arr)=>arr.reduce((s,x)=>s+x.played,0)/2; // matchs joués dans un groupe
+  let pa = grp[ga]? played(grp[ga]) : 0;
+  let pb = grp[gb]? played(grp[gb]) : 0;
+  // si même groupe (cas 2e vs 2e impossible, mais sécurité), prendre une seule fois
+  const totalPlayed = (ga===gb)? pa : (pa+pb);
+  const totalMax = (ga===gb)? 6 : 12;
+  let c = totalPlayed/totalMax;
+  return Math.max(0, Math.min(1, c));
+}
+// 4) % affiché = proba ramenée vers 50/50 selon la confiance, puis arrondi.
+//    Renvoie [pA, pB] entiers sommant à 100, bornés 5..95 pour rester crédible.
+function probaMatch(a,b){
+  if(!a||!b) return null;             // position pas encore connue -> pas de %
+  const pa = probBrute(a,b)*100;      // proba brute de A (0..100)
+  const c = confiance(a,b);
+  let shown = 50 + (pa-50)*c;         // tant que c faible -> proche 50
+  shown = Math.max(5, Math.min(95, shown));
+  const A = Math.round(shown);
+  return [A, 100-A];
+}
+// ===============================================================================
+
 // Structure officielle FIFA : 8 matchs où le 1er d'un groupe affronte un 3e,
 // avec la liste exacte des groupes 3es autorisés (Annexe C).
 const thirdSlots = [
@@ -361,31 +406,96 @@ const R32=[
   {n:85,a:()=>pos1("B"),b:()=>posThirdM(85),la:"1er B",lb:thirdLabel(85)},
   {n:87,a:()=>pos1("K"),b:()=>posThirdM(87),la:"1er K",lb:thirdLabel(87)}
 ];
-// Résolution des équipes
+// Résolution des équipes (16es)
 const win={}; // matchNum -> team projetée vainqueur
 R32.forEach(m=>{ m.tA=m.a(); m.tB=m.b(); win[m.n]=better(m.tA,m.tB); });
 
-// Rendu d'une case
-function teamRow(team,label,isWin){
-  if(team) return `<div class="r ${isWin?'win':'lose'}"><span class="f">${team.flag}</span><span class="nm">${team.name}</span></div>`;
-  return `<div class="r"><span class="nm" style="color:var(--dim)">${label||"à déterminer"}</span></div>`;
+// Tours suivants : on projette les vainqueurs jusqu'à la finale
+const R16=[
+  {n:89,x:74,y:77},{n:90,x:73,y:75},{n:91,x:76,y:78},{n:92,x:79,y:80},
+  {n:93,x:83,y:84},{n:94,x:81,y:82},{n:95,x:86,y:88},{n:96,x:85,y:87}
+];
+R16.forEach(m=>{ m.tA=win[m.x]; m.tB=win[m.y]; win[m.n]=better(m.tA,m.tB); });
+const QF=[{n:97,x:89,y:90},{n:98,x:93,y:94},{n:99,x:91,y:92},{n:100,x:95,y:96}];
+QF.forEach(m=>{ m.tA=win[m.x]; m.tB=win[m.y]; win[m.n]=better(m.tA,m.tB); });
+const SF=[{n:101,x:97,y:98},{n:102,x:99,y:100}];
+SF.forEach(m=>{ m.tA=win[m.x]; m.tB=win[m.y]; win[m.n]=better(m.tA,m.tB); });
+const FN={n:104,x:101,y:102}; FN.tA=win[101]; FN.tB=win[102]; win[104]=better(FN.tA,FN.tB);
+
+// Un groupe est "terminé" quand ses 6 matchs sont joués
+function groupDone(g){ return grp[g] ? (grp[g].reduce((s,x)=>s+x.played,0)/2)>=6 : false; }
+// Une équipe (objet) est "officiellement qualifiée" si son groupe est terminé
+function teamOfficial(t){ return t && t.g && groupDone(t.g); }
+// Un 16e est "validé" si ses deux équipes sont officiellement qualifiées
+function tieValidated(m){ return teamOfficial(m.tA) && teamOfficial(m.tB); }
+
+// Rendu d'une case (réutilisé pour tous les tours)
+function teamRow(team,label,isWin,pct){
+  const pctHtml = (pct!=null) ? `<span class="pct">${pct}%</span>` : '';
+  if(team) return `<div class="r ${isWin?'win':'lose'}"><span class="f">${team.flag}</span><span class="nm">${team.name}</span>${pctHtml}</div>`;
+  return `<div class="r"><span class="nm" style="color:var(--dim)">${label||"à déterminer"}</span>${pctHtml}</div>`;
 }
 function tieBox(m,labelA,labelB,extra){
   const wA=win[m.n]&&m.tA&&win[m.n].t===m.tA.t;
   const wB=win[m.n]&&m.tB&&win[m.n].t===m.tB.t;
   const s=R32_SCHED[m.n];
-  const head=`<div class="mn"><span>M${m.n}${s?' · '+s.city:''}</span>${s?'<span class="seedlbl">'+s.d+'</span>':''}</div>`;
+  const probs = probaMatch(m.tA,m.tB);
+  const pA = probs? probs[0] : null;
+  const pB = probs? probs[1] : null;
+  const valid = (s && tieValidated(m)) ? '<span class="valid">✓ Validé</span>' : '';
+  const headLeft = s ? ('M'+m.n+' · '+s.city) : ('M'+m.n);
+  const headRight = valid || (s? '<span class="seedlbl">'+s.d+'</span>' : '');
+  const head=`<div class="mn"><span>${headLeft}</span>${headRight}</div>`;
   const foot=s?`<div class="kotime">🕒 ${s.t} <span class="tz">Paris</span></div>`:'';
-  return `<div class="tie ${extra||''}">${head}${teamRow(m.tA,labelA,wA)}${teamRow(m.tB,labelB,wB)}${foot}</div>`;
+  return `<div class="tie ${extra||''} ${(s&&tieValidated(m))?'is-valid':''}">${head}${teamRow(m.tA,labelA,wA,pA)}${teamRow(m.tB,labelB,wB,pB)}${foot}</div>`;
 }
 
-const br=document.getElementById('bracket');
-// On n'affiche que les 16es de finale, dans l'ordre officiel des matchs (M73 → M88)
-const r32order=[73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88];
+// ===== BRACKET MIROIR (façon "Road to the Final") =====
+// Moitié gauche : M73,74,75,76,77,78,79,80 -> 8es 89-92 -> quarts 97,98 -> demie 101
+// Moitié droite : M81..88 -> 8es 93-96 -> quarts 99,100 -> demie 102 -> finale 104 au centre
 const r32map={};R32.forEach(m=>r32map[m.n]=m);
-let out='';
-r32order.forEach(n=>{const m=r32map[n];out+=tieBox(m,m.la,m.lb);});
-br.innerHTML=out;
+const r16map={};R16.forEach(m=>r16map[m.n]=m);
+const qfmap={};QF.forEach(m=>qfmap[m.n]=m);
+const sfmap={};SF.forEach(m=>sfmap[m.n]=m);
+
+// colonnes gauche -> centre
+const L16=[74,77,73,75,76,78,79,80];   // 8 seizièmes gauche
+const L8=[89,90,91,92];                 // 4 huitièmes gauche
+const L4=[97,98];                       // 2 quarts gauche
+const L2=[101];                         // 1 demie gauche
+const R16x=[83,84,81,82,86,88,85,87];  // 8 seizièmes droite
+const R8=[93,94,95,96];
+const R4=[99,100];
+const R2=[102];
+
+function col(title, nums, mapObj, isR32){
+  let inner = nums.map(n=>{
+    const m = mapObj[n];
+    return isR32 ? tieBox(m, m.la, m.lb) : tieBox(m);
+  }).join('');
+  return `<div class="bcol"><div class="bcol-t">${title}</div>${inner}</div>`;
+}
+
+const champ = win[104];
+const centerHtml = `
+  <div class="bcol bcenter">
+    <div class="bcol-t">Finale</div>
+    ${tieBox(FN)}
+    <div class="trophy"><div class="ic">🏆</div><div class="lb">Champion projeté</div><div class="champ">${champ?champ.flag+' '+champ.name:'—'}</div></div>
+  </div>`;
+
+const br=document.getElementById('bracket');
+br.innerHTML =
+  col('16es', L16, r32map, true) +
+  col('8es', L8, r16map, false) +
+  col('Quarts', L4, qfmap, false) +
+  col('Demie', L2, sfmap, false) +
+  centerHtml +
+  col('Demie', R2, sfmap, false) +
+  col('Quarts', R4, qfmap, false) +
+  col('8es', R8, r16map, false) +
+  col('16es', R16x, r32map, true);
+
 
 // ---- DIFFUSION DU JOUR (dynamique, depuis l'API) ----
 // Règles de chaînes (indicatives) : beIN partout (FR + MENA). TF1/M6 en clair pour les grosses affiches.
