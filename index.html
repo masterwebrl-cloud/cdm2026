@@ -539,44 +539,48 @@ function probaMatch(a,b){
 }
 // ===============================================================================
 
-// Structure officielle FIFA : 8 matchs où le 1er d'un groupe affronte un 3e,
-// avec la liste exacte des groupes 3es autorisés (Annexe C).
-const thirdSlots = [
-  {m:74, allowed:["A","B","C","D","F"]},
-  {m:77, allowed:["C","D","F","G","H"]},
-  {m:79, allowed:["C","E","F","H","I"]},
-  {m:80, allowed:["E","H","I","J","K"]},
-  {m:82, allowed:["A","E","H","I","J"]},
-  {m:81, allowed:["B","E","F","I","J"]},
-  {m:85, allowed:["E","F","G","I","J"]},
-  {m:87, allowed:["D","E","I","J","L"]}
+// Les 8 matchs où un 1er affronte un 3e (groupes fixes selon le format FIFA)
+// L'appariement avec le 3e se fait DYNAMIQUEMENT par rang :
+// meilleur 1er ↔ meilleur 3e, ..., pire 1er ↔ pire 3e
+const FIRST_VS_THIRD_SLOTS = [
+  {m:74, firstGroup:'E'},
+  {m:77, firstGroup:'I'},
+  {m:79, firstGroup:'A'},
+  {m:80, firstGroup:'L'},
+  {m:81, firstGroup:'D'},
+  {m:82, firstGroup:'G'},
+  {m:85, firstGroup:'B'},
+  {m:87, firstGroup:'K'}
 ];
 const qualifiedThirdGroups = qualifiedThirds.map(t=>t.gr);
 const thirdByGroup={};qualifiedThirds.forEach(t=>thirdByGroup[t.gr]=t);
 
-// Résout l'attribution : chaque slot reçoit un 3e de sa liste (bijection)
+// Apparier les 1ers (triés par force) aux 3es (triés par rang)
+// Contrainte : un 1er ne peut pas affronter un 3e de son propre groupe
 function assignThirds(){
-  const order=[...thirdSlots].sort((a,b)=>{
-    const oa=a.allowed.filter(g=>qualifiedThirdGroups.includes(g)).length;
-    const ob=b.allowed.filter(g=>qualifiedThirdGroups.includes(g)).length;
-    return oa-ob;
+  const sortedSlots=[...FIRST_VS_THIRD_SLOTS].sort((a,b)=>{
+    const A=grp[a.firstGroup]?.[0], B=grp[b.firstGroup]?.[0];
+    if(!A||!B) return 0;
+    return B.pts-A.pts || B.gd-A.gd || B.gf-A.gf;
   });
-  const used=new Set(); const result={};
+  const result={}; const usedThirds=new Set();
+  // Backtracking : essaie d'apparier chaque slot (du meilleur 1er au pire) avec le meilleur 3e dispo
   function solve(i){
-    if(i===order.length) return true;
-    const s=order[i];
-    const opts=s.allowed.filter(g=>qualifiedThirdGroups.includes(g)&&!used.has(g));
-    for(const g of opts){
-      used.add(g);result[s.m]=g;
-      if(solve(i+1))return true;
-      used.delete(g);delete result[s.m];
+    if(i===sortedSlots.length) return true;
+    const slot=sortedSlots[i];
+    for(const t of qualifiedThirds){
+      if(usedThirds.has(t.gr)) continue;
+      if(t.gr===slot.firstGroup) continue; // pas de match interne
+      usedThirds.add(t.gr); result[slot.m]=t.gr;
+      if(solve(i+1)) return true;
+      usedThirds.delete(t.gr); delete result[slot.m];
     }
     return false;
   }
   solve(0);
-  return result; // matchNum -> groupe 3e
+  return result;
 }
-const thirdAssign=assignThirds(); // {74:"C", ...}
+const thirdAssign=assignThirds(); // matchNum -> groupe 3e
 
 const pos1=g=>grp[g]?grp[g][0]:null;
 const pos2=g=>grp[g]?grp[g][1]:null;
