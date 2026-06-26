@@ -473,7 +473,7 @@ clearAll();
   const allMatches = [...liveGames, ...nextMatches];
   
   el.innerHTML = allMatches.map(g=>{
-    const lbl = g.status==='PAUSED' ? ui('ht') : (g.status==='SCHEDULED' ? '📅 Aujourd'hui' : ui('live'));
+    const lbl = g.status==='PAUSED' ? ui('ht') : (g.status==='SCHEDULED' ? "📅 Aujourd'hui" : ui('live'));
     let lineupHtml = '';
     
     // Afficher les compos si disponibles
@@ -499,7 +499,7 @@ clearAll();
     const borderColor = g.status==='IN_PLAY'?'rgba(255,90,90,.45)' : g.status==='SCHEDULED'?'rgba(100,180,255,.3)' : 'rgba(200,160,60,.3)';
     return '<div class="m" style="border-color:'+borderColor+';flex-direction:column;align-items:stretch;gap:6px;">'
       + '<div style="text-align:center;font-size:10px;color:'+(g.status==='SCHEDULED'?'#64b4ff':'#ff5a5a')+';font-weight:700;letter-spacing:.06em;">'+
-        (g.status==='IN_PLAY'?'● '+ui('live') : g.status==='SCHEDULED'?'📅 Aujourd'hui' : '⏸ '+ui('ht'))+
+        (g.status==='IN_PLAY'?'● '+ui('live') : g.status==='SCHEDULED'?"📅 Aujourd'hui" : '⏸ '+ui('ht'))+
       '</div>'
       + '<div style="display:flex;align-items:center;gap:8px;">'
       + '<span class="s"><span class="f">'+flagImg(g.h)+'</span><span>'+cn(g.h)+'</span></span>'
@@ -831,7 +831,7 @@ function renderTV(){
   if(tag) tag.textContent = ui('day_label')+' '+usLabel;
 
   if(!today.length){
-    tvEl.innerHTML='<div style="padding:18px;color:var(--dim);font-size:13px;">📺 Aucun match aujourd'hui</div>';
+    tvEl.innerHTML='<div style="padding:18px;color:var(--dim);font-size:13px;">📺 Aucun match aujourd&rsquo;hui</div>';
     return;
   }
   tvEl.innerHTML = today.map(f=>{
