@@ -1,6 +1,7 @@
 // netlify/functions/scores.js
 // Interroge football-data.org (compétition WC = World Cup) côté serveur.
-// Le tier gratuit couvre la Coupe du Monde (10 req/min). Clé gratuite sur football-data.org.
+// Inclut les compositions (lineups) quand disponibles (matchs live/terminés).
+// Le tier gratuit couvre la Coupe du Monde (10 req/min).
 // Variable d'environnement Netlify attendue : FOOTBALL_DATA_TOKEN
 // Réponse : { fixtures:[...], updated } ou { error }
 
@@ -30,19 +31,59 @@ exports.handler = async function () {
     const data = await res.json();
     const matches = data.matches || [];
 
-    const slim = matches.map(m => ({
-      id: m.id,
-      date: m.utcDate,
-      status: m.status,                       // SCHEDULED, TIMED, IN_PLAY, PAUSED, FINISHED
-      stage: m.stage,                          // GROUP_STAGE, LAST_16, etc.
-      group: m.group || null,                  // "GROUP_A"... ou null
-      home: m.homeTeam ? (m.homeTeam.name || m.homeTeam.shortName) : null,
-      away: m.awayTeam ? (m.awayTeam.name || m.awayTeam.shortName) : null,
-      homeTla: m.homeTeam ? m.homeTeam.tla : null,
-      awayTla: m.awayTeam ? m.awayTeam.tla : null,
-      homeGoals: m.score && m.score.fullTime ? m.score.fullTime.home : null,
-      awayGoals: m.score && m.score.fullTime ? m.score.fullTime.away : null
-    }));
+    const slim = matches.map(m => {
+      const base = {
+        id: m.id,
+        date: m.utcDate,
+        status: m.status,                       // SCHEDULED, TIMED, IN_PLAY, PAUSED, FINISHED
+        stage: m.stage,                          // GROUP_STAGE, LAST_16, etc.
+        group: m.group || null,                  // "GROUP_A"... ou null
+        home: m.homeTeam ? (m.homeTeam.name || m.homeTeam.shortName) : null,
+        away: m.awayTeam ? (m.awayTeam.name || m.awayTeam.shortName) : null,
+        homeTla: m.homeTeam ? m.homeTeam.tla : null,
+        awayTla: m.awayTeam ? m.awayTeam.tla : null,
+        homeGoals: m.score && m.score.fullTime ? m.score.fullTime.home : null,
+        awayGoals: m.score && m.score.fullTime ? m.score.fullTime.away : null
+      };
+
+      // Ajouter les lineups si disponibles (matchs live ou terminés)
+      if (m.lineups && m.lineups.length > 0) {
+        const homeLineup = m.lineups.find(l => l.team.tla === m.homeTeam.tla);
+        const awayLineup = m.lineups.find(l => l.team.tla === m.awayTeam.tla);
+        
+        if (homeLineup) {
+          base.homeFormation = homeLineup.formation || null;
+          base.homeLineup = homeLineup.lineup ? homeLineup.lineup.map(p => ({
+            number: p.shirtNumber,
+            name: p.player.name,
+            position: p.position
+          })) : [];
+          base.homeSubstitutes = homeLineup.bench ? homeLineup.bench.map(p => ({
+            number: p.shirtNumber,
+            name: p.player.name,
+            position: p.position
+          })) : [];
+          base.homeCoach = homeLineup.coach ? homeLineup.coach.name : null;
+        }
+        
+        if (awayLineup) {
+          base.awayFormation = awayLineup.formation || null;
+          base.awayLineup = awayLineup.lineup ? awayLineup.lineup.map(p => ({
+            number: p.shirtNumber,
+            name: p.player.name,
+            position: p.position
+          })) : [];
+          base.awaySubstitutes = awayLineup.bench ? awayLineup.bench.map(p => ({
+            number: p.shirtNumber,
+            name: p.player.name,
+            position: p.position
+          })) : [];
+          base.awayCoach = awayLineup.coach ? awayLineup.coach.name : null;
+        }
+      }
+
+      return base;
+    });
 
     const payload = { count: slim.length, fixtures: slim, updated: new Date().toISOString() };
     CACHE = { ts: now, data: payload };
