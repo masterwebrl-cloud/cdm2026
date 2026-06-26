@@ -2,8 +2,14 @@
   functions = "netlify/functions"
   publish = "."
 
-# Joli chemin : /api/scores -> la fonction
+# /api/scores -> Netlify Function scores
 [[redirects]]
   from = "/api/scores"
   to = "/.netlify/functions/scores"
+  status = 200
+
+# /api/chat -> Netlify Function chat (GET messages + POST nouveau message)
+[[redirects]]
+  from = "/api/chat"
+  to = "/.netlify/functions/chat"
   status = 200
