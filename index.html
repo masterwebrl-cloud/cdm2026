@@ -363,7 +363,7 @@ function apiCode(name){
 function buildFromLive(fixtures){
   const fresh={}; for(const code in st){ fresh[code]={t:code,g:st[code].g,w:0,d:0,l:0,gf:0,ga:0,pts:0,played:0,h2h:{},liveCodes:[]}; }
   const finishedMatches=[];
-  const inPlay=[];           // matchs en cours : {h,a,hs,as,status}
+  const inPlay=[];           // matchs en cours : {h,a,hs,as,status,...lineups}
   let usable=0;
   function applyMatch(H,A,hs,as,isLive){
     H.gf+=hs;H.ga+=as;H.played++; A.gf+=as;A.ga+=hs;A.played++;
@@ -382,7 +382,13 @@ function buildFromLive(fixtures){
       if(isGroup){ applyMatch(fresh[hc],fresh[ac],f.homeGoals,f.awayGoals,false); usable++; }
     } else if(live){
       const hs=(f.homeGoals==null?0:f.homeGoals), as=(f.awayGoals==null?0:f.awayGoals);
-      inPlay.push({h:hc,a:ac,hs,as,status:f.status});
+      const liveMatch = {h:hc,a:ac,hs,as,status:f.status};
+      // Ajouter les compos si disponibles
+      if(f.homeFormation) liveMatch.homeFormation = f.homeFormation;
+      if(f.awayFormation) liveMatch.awayFormation = f.awayFormation;
+      if(f.homeLineup && Array.isArray(f.homeLineup)) liveMatch.homeLineup = f.homeLineup;
+      if(f.awayLineup && Array.isArray(f.awayLineup)) liveMatch.awayLineup = f.awayLineup;
+      inPlay.push(liveMatch);
       // ► Les matchs en cours COMPTENT désormais dans le classement (score provisoire)
       if(isGroup){ applyMatch(fresh[hc],fresh[ac],hs,as,true); usable++; }
     }
@@ -435,13 +441,37 @@ clearAll();
   wrap.style.display='';
   el.innerHTML = liveGames.map(g=>{
     const lbl = g.status==='PAUSED' ? ui('ht') : ui('live');
+    let lineupHtml = '';
+    
+    // Afficher les compos si disponibles
+    if(g.homeLineup && g.homeLineup.length){
+      lineupHtml = `<div style="margin-top:10px;padding-top:10px;border-top:1px solid var(--line);font-size:10px;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;">
+          <div>
+            <div style="font-weight:700;color:var(--gold);margin-bottom:4px;">XI · ${g.homeFormation || '?'}</div>
+            <div style="font-size:9px;color:var(--dim);line-height:1.4;">
+              ${g.homeLineup.slice(0,11).map(p=>`<div>#${p.number} ${p.name} · ${p.position}</div>`).join('')}
+            </div>
+          </div>
+          <div>
+            <div style="font-weight:700;color:var(--gold);margin-bottom:4px;">XI · ${g.awayFormation || '?'}</div>
+            <div style="font-size:9px;color:var(--dim);line-height:1.4;">
+              ${g.awayLineup.slice(0,11).map(p=>`<div>#${p.number} ${p.name} · ${p.position}</div>`).join('')}
+            </div>
+          </div>
+        </div>
+      </div>`;
+    }
+    
     return '<div class="m" style="border-color:rgba(255,90,90,.45);flex-direction:column;align-items:stretch;gap:6px;">'
       + '<div style="text-align:center;font-size:10px;color:#ff5a5a;font-weight:700;letter-spacing:.06em;">● '+lbl+'</div>'
       + '<div style="display:flex;align-items:center;gap:8px;">'
       + '<span class="s"><span class="f">'+flagImg(g.h)+'</span><span>'+cn(g.h)+'</span></span>'
       + '<span class="c"><span style="color:var(--text)">'+g.hs+'</span> – <span style="color:var(--text)">'+g.as+'</span></span>'
       + '<span class="s a"><span class="f">'+flagImg(g.a)+'</span><span>'+cn(g.a)+'</span></span>'
-      + '</div></div>';
+      + '</div>'
+      + lineupHtml
+      + '</div>';
   }).join('');
 })();
 
