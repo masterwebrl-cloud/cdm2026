@@ -62,22 +62,33 @@ tr.q3 .rk{color:var(--gold);font-weight:700;}
 .proj-banner{background:linear-gradient(90deg,rgba(232,184,75,.12),transparent);border:1px solid var(--gold-soft);border-left:3px solid var(--gold);border-radius:8px;padding:11px 14px;font-size:12.5px;color:var(--muted);margin-bottom:18px;}
 .proj-banner b{color:var(--gold);}
 
-/* Conteneur scrollable du bracket : gère les fades latéraux et le scroll snap */
+/* === MODE DESKTOP : bracket miroir scrollable === */
 .bracket-scroll{position:relative;overflow-x:auto;overflow-y:hidden;padding-bottom:14px;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity;}
 .bracket-scroll::-webkit-scrollbar{height:8px;}
 .bracket-scroll::-webkit-scrollbar-track{background:transparent;}
 .bracket-scroll::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px;}
 .bracket-scroll::-webkit-scrollbar-thumb:hover{background:var(--muted);}
 
-/* Indicateur de scroll pour mobile */
-.scroll-hint{display:none;text-align:center;font-size:11px;color:var(--dim);margin-bottom:8px;letter-spacing:.04em;}
-.scroll-hint::before{content:"← ";color:var(--gold);}
-.scroll-hint::after{content:" →";color:var(--gold);}
-
 .bracket{display:flex;align-items:stretch;gap:6px;min-width:1700px;padding:0 4px;}
 .bcol{display:flex;flex-direction:column;justify-content:space-around;flex:1;min-width:150px;gap:6px;scroll-snap-align:start;}
 .bcol.bcenter{justify-content:center;min-width:190px;}
 .bcol-t{font-family:"Barlow Condensed",sans-serif;font-weight:600;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);text-align:center;margin-bottom:6px;}
+
+/* === MODE MOBILE : bracket linéaire (tours empilés) === */
+.bracket-linear{display:none;flex-direction:column;gap:22px;}
+.round-section{display:flex;flex-direction:column;gap:8px;}
+.round-title{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:16px;letter-spacing:.08em;text-transform:uppercase;color:var(--gold);text-align:center;padding:8px 0;border-top:1px solid var(--gold-soft);border-bottom:1px solid var(--gold-soft);background:linear-gradient(90deg,transparent,rgba(232,184,75,.06),transparent);}
+.round-title.final-title{font-size:20px;color:var(--gold);background:linear-gradient(90deg,transparent,rgba(232,184,75,.15),transparent);}
+.round-ties{display:flex;flex-direction:column;gap:8px;}
+.round-ties.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.round-ties.final-only{align-items:center;}
+.round-ties.final-only .tie{max-width:380px;width:100%;border-color:var(--gold);box-shadow:0 0 0 1px rgba(232,184,75,.2);}
+.trophy-linear{text-align:center;padding:18px 0 8px;}
+.trophy-linear .ic{font-size:42px;}
+.trophy-linear .lb{font-family:"Barlow Condensed",sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.08em;font-size:13px;color:var(--gold);margin-top:4px;}
+.trophy-linear .champ{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:18px;margin-top:6px;}
+
+/* Tie commun aux deux modes */
 .tie.is-valid{border-color:var(--green);box-shadow:0 0 0 1px rgba(78,199,127,.3);}
 .valid{font-size:9px;color:var(--green);font-weight:700;letter-spacing:.04em;text-transform:uppercase;}
 .tie{background:linear-gradient(180deg,var(--panel),#0e131c);border:1px solid var(--line);border-radius:10px;margin:0;overflow:hidden;}
@@ -96,13 +107,15 @@ tr.q3 .rk{color:var(--gold);font-weight:700;}
 .tie.final{border-color:var(--gold);background:linear-gradient(180deg,var(--gold-soft),var(--panel));}
 .kotime{font-size:10px;color:var(--dim);padding:4px 12px 8px;}
 .kotime .tz{opacity:.7;font-size:9px;}
+
+/* Trophée (mode desktop) */
 .trophy{text-align:center;margin-top:14px;}
 .trophy .ic{font-size:34px;}
 .trophy .lb{font-family:"Barlow Condensed",sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.08em;font-size:12px;color:var(--gold);margin-top:2px;}
 .champ{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:15px;margin-top:4px;}
 
-/* ========== RESPONSIVE : TABLETTE (≤ 1279px) ========== */
-@media (max-width: 1279px){
+/* ========== RESPONSIVE TABLETTE (≤ 1023px) : encore miroir mais compact ========== */
+@media (max-width: 1023px) and (min-width: 768px){
   .bracket{min-width:1400px;gap:5px;}
   .bcol{min-width:135px;gap:5px;}
   .bcol.bcenter{min-width:175px;}
@@ -113,41 +126,20 @@ tr.q3 .rk{color:var(--gold);font-weight:700;}
   .bcol-t{font-size:11px;}
 }
 
-/* ========== RESPONSIVE : MOBILE (≤ 767px) ========== */
+/* ========== RESPONSIVE MOBILE (≤ 767px) : BASCULE EN MODE LINÉAIRE ========== */
 @media (max-width: 767px){
-  .bracket{min-width:1100px;gap:4px;padding:0 2px;}
-  .bcol{min-width:115px;gap:4px;}
-  .bcol.bcenter{min-width:145px;}
-  .bcol-t{font-size:10px;margin-bottom:4px;letter-spacing:.05em;}
-  .tie{border-radius:8px;}
-  .tie .r{padding:7px 8px;font-size:11px;gap:5px;}
-  .tie .r .f{font-size:11px;}
-  .tie .r .pct{font-size:10px;min-width:26px;margin-left:4px;}
-  .tie .mn{padding:5px 8px 0;font-size:8.5px;gap:4px;}
-  .tie .seedlbl{font-size:8.5px;}
-  .kotime{padding:3px 8px 6px;font-size:9px;}
-  .kotime .tz{font-size:8px;}
-  .trophy .ic{font-size:28px;}
-  .trophy .lb{font-size:10px;}
-  .champ{font-size:13px;}
-  .valid{font-size:8px;}
-
-  /* Étendre le bracket sur toute la largeur de l'écran (au-delà du wrap) */
-  .bracket-scroll{margin-left:-20px;margin-right:-20px;padding-left:20px;padding-right:20px;}
-  .scroll-hint{display:block;}
-
-  /* Bannière de projection plus compacte */
+  .bracket-scroll{display:none;}    /* on masque le miroir scrollable */
+  .bracket-linear{display:flex;}    /* on affiche le linéaire */
   .proj-banner{padding:9px 11px;font-size:11.5px;}
 }
 
-/* ========== RESPONSIVE : TRÈS PETIT MOBILE (≤ 420px) ========== */
+/* ========== TRÈS PETIT MOBILE (≤ 420px) ========== */
 @media (max-width: 420px){
-  .bracket{min-width:950px;}
-  .bcol{min-width:100px;}
-  .bcol.bcenter{min-width:130px;}
-  .tie .r{padding:6px 7px;font-size:10.5px;}
-  .tie .r .pct{font-size:9.5px;min-width:24px;}
-  .tie .mn{font-size:8px;}
+  .round-ties.grid-2{grid-template-columns:1fr;}  /* en dessous de 420px, tout en 1 colonne */
+  .round-title{font-size:14px;padding:6px 0;}
+  .round-title.final-title{font-size:17px;}
+  .tie .r{padding:7px 10px;font-size:12px;}
+  .tie .mn{padding:5px 10px 0;font-size:9.5px;}
 }
 
 footer{text-align:center;font-size:11px;color:var(--dim);margin-top:44px;padding-top:20px;border-top:1px solid var(--line);}
@@ -184,8 +176,8 @@ footer{text-align:center;font-size:11px;color:var(--dim);margin-top:44px;padding
 <h2 id="bracket-title">16<sup>es</sup> de finale — projection</h2>
 <div class="sec-tag" id="bracket-tag"></div>
 <div class="proj-banner" id="bracket-banner"></div>
-<div class="scroll-hint" id="scroll-hint">Faites défiler horizontalement</div>
 <div class="bracket-scroll"><div class="bracket" id="bracket"></div></div>
+<div class="bracket-linear" id="bracket-linear"></div>
 
 <h2 id="results-title">Résultats</h2>
 <div class="sec-tag" id="results-tag"></div>
@@ -260,7 +252,6 @@ function updateUI(){
   document.getElementById('bracket-title').innerHTML = t('bracket_title');
   document.getElementById('bracket-tag').textContent = t('bracket_tag');
   document.getElementById('bracket-banner').innerHTML = t('bracket_banner');
-  const sh = document.getElementById('scroll-hint'); if(sh) sh.textContent = ui('scroll_hint');
   
   document.getElementById('results-title').textContent = t('results_title');
   document.getElementById('results-tag').textContent = t('results_tag');
@@ -385,7 +376,7 @@ async function tryLive(){
 
 
 // Conteneurs (vidés à chaque rendu pour permettre le re-render après l'API)
-function clearAll(){ ['groups','tv','thirds','bracket','matches','live'].forEach(id=>{const el=document.getElementById(id); if(el) el.innerHTML='';}); }
+function clearAll(){ ['groups','tv','thirds','bracket','bracket-linear','matches','live'].forEach(id=>{const el=document.getElementById(id); if(el) el.innerHTML='';}); }
 
 function renderAll(){
 clearAll();
@@ -670,6 +661,30 @@ br.innerHTML =
   col(ui('qf'), R4, qfmap, false) +
   col(ui('r16'), R8, r16map, false) +
   col(ui('r32'), R16x, r32map, true);
+
+// ===== RENDU MOBILE LINÉAIRE (tours empilés, sans miroir) =====
+// On reconstruit l'ordre des 16es selon le bracket réel : L16 (gauche) puis R16x (droite)
+// Idem pour les 8es, quarts, demies. La finale est unique.
+const allR32 = [...L16, ...R16x].map(n=>r32map[n]);
+const allR16 = [...L8, ...R8].map(n=>r16map[n]);
+const allQF  = [...L4, ...R4].map(n=>qfmap[n]);
+const allSF  = [...L2, ...R2].map(n=>sfmap[n]);
+
+function renderRound(titleKey, ties, layout, isFinal){
+  const titleClass = isFinal ? 'round-title final-title' : 'round-title';
+  const tiesClass = isFinal ? 'round-ties final-only' : (layout==='grid' ? 'round-ties grid-2' : 'round-ties');
+  const tiesHtml = ties.map(m=>tieBox(m, m.la, m.lb)).join('');
+  return `<div class="round-section"><div class="${titleClass}">${ui(titleKey)}</div><div class="${tiesClass}">${tiesHtml}</div></div>`;
+}
+
+const brLin = document.getElementById('bracket-linear');
+brLin.innerHTML =
+  renderRound('r32', allR32, 'col', false) +    // 16 ties empilés
+  renderRound('r16', allR16, 'grid', false) +   // 8 ties en grille 2 colonnes (1 si <420px)
+  renderRound('qf',  allQF,  'grid', false) +   // 4 ties en grille 2 colonnes
+  renderRound('sf',  allSF,  'grid', false) +   // 2 ties en grille 2 colonnes
+  renderRound('final', [FN], 'col', true) +     // 1 tie centrée, doré
+  `<div class="trophy-linear"><div class="ic">🏆</div><div class="lb">${ui('champion')}</div><div class="champ">${champ?champ.flag+' '+cn(champ.t):'—'}</div></div>`;
 
 
 // ---- DIFFUSION DU JOUR (dynamique, depuis l'API) ----
