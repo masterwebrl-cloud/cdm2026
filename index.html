@@ -62,17 +62,14 @@ tr.q3 .rk{color:var(--gold);font-weight:700;}
 .proj-banner{background:linear-gradient(90deg,rgba(232,184,75,.12),transparent);border:1px solid var(--gold-soft);border-left:3px solid var(--gold);border-radius:8px;padding:11px 14px;font-size:12.5px;color:var(--muted);margin-bottom:18px;}
 .proj-banner b{color:var(--gold);}
 
-/* === MODE DESKTOP : bracket miroir scrollable === */
-.bracket-scroll{position:relative;overflow-x:auto;overflow-y:hidden;padding-bottom:14px;-webkit-overflow-scrolling:touch;scroll-snap-type:x proximity;}
-.bracket-scroll::-webkit-scrollbar{height:8px;}
-.bracket-scroll::-webkit-scrollbar-track{background:transparent;}
-.bracket-scroll::-webkit-scrollbar-thumb{background:var(--line);border-radius:4px;}
-.bracket-scroll::-webkit-scrollbar-thumb:hover{background:var(--muted);}
+/* === MODE DESKTOP : bracket miroir adaptatif (100% largeur, sans scroll) === */
+.bracket-scroll{position:relative;width:100%;overflow:visible;padding-bottom:14px;}
 
-.bracket{display:flex;align-items:stretch;gap:6px;min-width:1700px;padding:0 4px;}
-.bcol{display:flex;flex-direction:column;justify-content:space-around;flex:1;min-width:150px;gap:6px;scroll-snap-align:start;}
-.bcol.bcenter{justify-content:center;min-width:190px;}
-.bcol-t{font-family:"Barlow Condensed",sans-serif;font-weight:600;font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--dim);text-align:center;margin-bottom:6px;}
+/* Le bracket prend 100% du parent. 9 colonnes réparties équitablement via flex. */
+.bracket{display:flex;align-items:stretch;gap:0.5%;width:100%;padding:0;}
+.bcol{display:flex;flex-direction:column;justify-content:space-around;flex:1 1 0;min-width:0;gap:6px;}
+.bcol.bcenter{flex:1.15 1 0;justify-content:center;}
+.bcol-t{font-family:"Barlow Condensed",sans-serif;font-weight:600;font-size:0.75rem;letter-spacing:.06em;text-transform:uppercase;color:var(--dim);text-align:center;margin-bottom:6px;}
 
 /* === MODE MOBILE : bracket linéaire (tours empilés) === */
 .bracket-linear{display:none;flex-direction:column;gap:22px;}
@@ -88,54 +85,74 @@ tr.q3 .rk{color:var(--gold);font-weight:700;}
 .trophy-linear .lb{font-family:"Barlow Condensed",sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.08em;font-size:13px;color:var(--gold);margin-top:4px;}
 .trophy-linear .champ{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:18px;margin-top:6px;}
 
-/* Tie commun aux deux modes */
+/* Tie commun aux deux modes — utilise des unités relatives */
 .tie.is-valid{border-color:var(--green);box-shadow:0 0 0 1px rgba(78,199,127,.3);}
-.valid{font-size:9px;color:var(--green);font-weight:700;letter-spacing:.04em;text-transform:uppercase;}
-.tie{background:linear-gradient(180deg,var(--panel),#0e131c);border:1px solid var(--line);border-radius:10px;margin:0;overflow:hidden;}
-.tie .r{display:flex;align-items:center;gap:7px;padding:9px 12px;font-size:13px;}
+.valid{font-size:0.55rem;color:var(--green);font-weight:700;letter-spacing:.04em;text-transform:uppercase;}
+.tie{background:linear-gradient(180deg,var(--panel),#0e131c);border:1px solid var(--line);border-radius:8px;margin:0;overflow:hidden;width:100%;}
+.tie .r{display:flex;align-items:center;gap:5px;padding:7px 8px;font-size:0.75rem;}
 .tie .r+.r{border-top:1px solid var(--line-soft);}
-.tie .r .f{font-size:13px;}
-.tie .r .nm{flex:1;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.tie .r .pct{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:12px;color:var(--muted);margin-left:6px;min-width:32px;text-align:right;}
+.tie .r .f{font-size:0.75rem;flex-shrink:0;}
+.tie .r .nm{flex:1;min-width:0;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+.tie .r .pct{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:0.7rem;color:var(--muted);margin-left:4px;flex-shrink:0;text-align:right;}
 .tie .r.win .pct{color:var(--green);}
 .tie .r.win .nm{color:var(--green);font-weight:600;}
 .tie .r.lose .nm{color:var(--dim);}
-.tie .r .seed{font-size:9px;color:var(--dim);text-transform:uppercase;}
-.tie .mn{font-size:10px;color:var(--dim);padding:6px 12px 0;letter-spacing:.06em;display:flex;justify-content:space-between;text-transform:uppercase;gap:6px;}
-.tie .mn span:first-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
-.tie .seedlbl{font-size:10px;color:var(--dim);margin-left:auto;flex-shrink:0;}
+.tie .r .seed{font-size:0.55rem;color:var(--dim);text-transform:uppercase;}
+.tie .mn{font-size:0.6rem;color:var(--dim);padding:5px 8px 0;letter-spacing:.04em;display:flex;justify-content:space-between;text-transform:uppercase;gap:4px;}
+.tie .mn span:first-child{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;min-width:0;}
+.tie .seedlbl{font-size:0.6rem;color:var(--dim);margin-left:auto;flex-shrink:0;}
 .tie.final{border-color:var(--gold);background:linear-gradient(180deg,var(--gold-soft),var(--panel));}
-.kotime{font-size:10px;color:var(--dim);padding:4px 12px 8px;}
-.kotime .tz{opacity:.7;font-size:9px;}
+.kotime{font-size:0.6rem;color:var(--dim);padding:3px 8px 6px;}
+.kotime .tz{opacity:.7;font-size:0.55rem;}
 
 /* Trophée (mode desktop) */
 .trophy{text-align:center;margin-top:14px;}
 .trophy .ic{font-size:34px;}
-.trophy .lb{font-family:"Barlow Condensed",sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.08em;font-size:12px;color:var(--gold);margin-top:2px;}
-.champ{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:15px;margin-top:4px;}
+.trophy .lb{font-family:"Barlow Condensed",sans-serif;font-weight:700;text-transform:uppercase;letter-spacing:.08em;font-size:0.75rem;color:var(--gold);margin-top:2px;}
+.champ{font-family:"Barlow Condensed",sans-serif;font-weight:700;font-size:0.9rem;margin-top:4px;}
 
-/* ========== RESPONSIVE TABLETTE (≤ 1023px) : encore miroir mais compact ========== */
+/* ========== RESPONSIVE : ÉCRAN ÉTROIT MAIS DESKTOP (1024-1199px) ========== */
+@media (max-width: 1199px) and (min-width: 1024px){
+  /* Légère réduction pour que ça reste lisible */
+  .tie .r{padding:6px 7px;font-size:0.72rem;}
+  .tie .mn{padding:4px 7px 0;}
+  .kotime{padding:3px 7px 5px;}
+}
+
+/* ========== RESPONSIVE : TABLETTE (768-1023px) : reste en miroir compact ========== */
 @media (max-width: 1023px) and (min-width: 768px){
-  .bracket{min-width:1400px;gap:5px;}
-  .bcol{min-width:135px;gap:5px;}
-  .bcol.bcenter{min-width:175px;}
-  .tie .r{padding:8px 10px;font-size:12px;}
-  .tie .r .pct{font-size:11px;min-width:30px;}
-  .tie .mn{padding:5px 10px 0;font-size:9.5px;}
-  .kotime{padding:4px 10px 7px;font-size:9.5px;}
-  .bcol-t{font-size:11px;}
+  .bracket{gap:0.4%;}
+  .tie{border-radius:7px;}
+  .tie .r{padding:5px 6px;font-size:0.68rem;gap:4px;}
+  .tie .r .pct{font-size:0.62rem;margin-left:3px;}
+  .tie .mn{padding:4px 6px 0;font-size:0.55rem;}
+  .tie .seedlbl{font-size:0.55rem;}
+  .kotime{padding:2px 6px 4px;font-size:0.55rem;}
+  .bcol-t{font-size:0.65rem;margin-bottom:4px;}
+  .valid{font-size:0.5rem;}
+  .trophy .ic{font-size:28px;}
+  .trophy .lb{font-size:0.65rem;}
+  .champ{font-size:0.78rem;}
 }
 
 /* ========== RESPONSIVE MOBILE (≤ 767px) : BASCULE EN MODE LINÉAIRE ========== */
 @media (max-width: 767px){
-  .bracket-scroll{display:none;}    /* on masque le miroir scrollable */
-  .bracket-linear{display:flex;}    /* on affiche le linéaire */
+  .bracket-scroll{display:none;}
+  .bracket-linear{display:flex;}
   .proj-banner{padding:9px 11px;font-size:11.5px;}
+  /* En mode linéaire les ties peuvent reprendre des tailles confortables */
+  .tie .r{padding:9px 12px;font-size:13px;gap:7px;}
+  .tie .r .f{font-size:13px;}
+  .tie .r .pct{font-size:12px;margin-left:6px;min-width:32px;}
+  .tie .mn{padding:6px 12px 0;font-size:10px;gap:6px;}
+  .tie .seedlbl{font-size:10px;}
+  .kotime{padding:4px 12px 8px;font-size:10px;}
+  .valid{font-size:9px;}
 }
 
 /* ========== TRÈS PETIT MOBILE (≤ 420px) ========== */
 @media (max-width: 420px){
-  .round-ties.grid-2{grid-template-columns:1fr;}  /* en dessous de 420px, tout en 1 colonne */
+  .round-ties.grid-2{grid-template-columns:1fr;}
   .round-title{font-size:14px;padding:6px 0;}
   .round-title.final-title{font-size:17px;}
   .tie .r{padding:7px 10px;font-size:12px;}
