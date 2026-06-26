@@ -376,7 +376,7 @@ function buildFromLive(fixtures){
     const hc=tlaCode(f.homeTla)||apiCode(f.home), ac=tlaCode(f.awayTla)||apiCode(f.away);
     if(!hc||!ac||!fresh[hc]||!fresh[ac]) return;
     const done = f.status==='FINISHED';
-    const live = f.status==='IN_PLAY' || f.status==='PAUSED';   // PAUSED = mi-temps
+    const live = f.status==='IN_PLAY' || f.status==='PAUSED' || f.status==='LIVE';   // LIVE = en cours, PAUSED = mi-temps
     if(done && f.homeGoals!=null && f.awayGoals!=null){
       finishedMatches.push([hc,f.homeGoals,ac,f.awayGoals]);
       if(isGroup){ applyMatch(fresh[hc],fresh[ac],f.homeGoals,f.awayGoals,false); usable++; }
@@ -808,7 +808,7 @@ function renderTV(){
     const overnight = (parisDay !== compDay);
     const hParLabel = hPar + (overnight ? ' <span style="color:var(--dim);font-size:10px;">'+parisDow+'</span>' : '');
     const done = f.status==='FINISHED';
-    const live = f.status==='IN_PLAY' || f.status==='PAUSED';
+    const live = f.status==='IN_PLAY' || f.status==='PAUSED' || f.status==='LIVE';
     const cls = done?'done':(live?'live':'');
     let badge='';
     if(done) badge='<span class="badge-done">'+(f.homeGoals!=null?f.homeGoals+' – '+f.awayGoals:'')+'</span>';
