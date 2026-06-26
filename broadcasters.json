@@ -1,0 +1,244 @@
+{
+  "broadcasters": {
+    "MEX": {
+      "country": "Mexico",
+      "channels": ["TUDN", "Televisa", "ESPN Mexico"],
+      "primary": "TUDN"
+    },
+    "KOR": {
+      "country": "South Korea",
+      "channels": ["SBS", "KBS", "MBC"],
+      "primary": "SBS"
+    },
+    "CZE": {
+      "country": "Czechia",
+      "channels": ["ČT 1", "ČT 2"],
+      "primary": "ČT 1"
+    },
+    "RSA": {
+      "country": "South Africa",
+      "channels": ["SABC", "SuperSport"],
+      "primary": "SuperSport"
+    },
+    "CAN": {
+      "country": "Canada",
+      "channels": ["TSN", "CTV", "RDS"],
+      "primary": "TSN"
+    },
+    "SUI": {
+      "country": "Switzerland",
+      "channels": ["SRF", "RTS", "RSI"],
+      "primary": "SRF"
+    },
+    "BIH": {
+      "country": "Bosnia & Herzegovina",
+      "channels": ["BHRT", "OBN", "FTV"],
+      "primary": "BHRT"
+    },
+    "QAT": {
+      "country": "Qatar",
+      "channels": ["beIN Sports", "Qatar TV"],
+      "primary": "beIN Sports"
+    },
+    "BRA": {
+      "country": "Brazil",
+      "channels": ["Globo", "SporTV", "Sportv"],
+      "primary": "Globo"
+    },
+    "MAR": {
+      "country": "Morocco",
+      "channels": ["Al Aoula", "Maroc Telecom Sport"],
+      "primary": "Al Aoula"
+    },
+    "SCO": {
+      "country": "Scotland",
+      "channels": ["BBC", "ITV"],
+      "primary": "BBC"
+    },
+    "HTI": {
+      "country": "Haiti",
+      "channels": ["Télé Haiti", "Magique TV"],
+      "primary": "Magique TV"
+    },
+    "USA": {
+      "country": "United States",
+      "channels": ["Fox Sports", "Telemundo", "Peacock"],
+      "primary": "Fox Sports"
+    },
+    "AUS": {
+      "country": "Australia",
+      "channels": ["SBS", "Nine Network"],
+      "primary": "SBS"
+    },
+    "PAR": {
+      "country": "Paraguay",
+      "channels": ["Tigo Sports", "Paraguay TV"],
+      "primary": "Tigo Sports"
+    },
+    "TUR": {
+      "country": "Turkey",
+      "channels": ["TRT", "beIN Sports Turkey"],
+      "primary": "TRT"
+    },
+    "GER": {
+      "country": "Germany",
+      "channels": ["ARD", "ZDF", "MagentaTV"],
+      "primary": "ARD"
+    },
+    "CIV": {
+      "country": "Ivory Coast",
+      "channels": ["RTI", "Canal+"],
+      "primary": "RTI"
+    },
+    "ECU": {
+      "country": "Ecuador",
+      "channels": ["TC TV", "Ecuavisa", "Ecuador TV"],
+      "primary": "TC TV"
+    },
+    "CUW": {
+      "country": "Curaçao",
+      "channels": ["SVB", "Telesur"],
+      "primary": "SVB"
+    },
+    "NED": {
+      "country": "Netherlands",
+      "channels": ["NOS", "Keuken Kampioen Divisie"],
+      "primary": "NOS"
+    },
+    "SWE": {
+      "country": "Sweden",
+      "channels": ["SVT", "C More"],
+      "primary": "SVT"
+    },
+    "JPN": {
+      "country": "Japan",
+      "channels": ["NHK", "テレビ朝日", "WOWOW"],
+      "primary": "NHK"
+    },
+    "TUN": {
+      "country": "Tunisia",
+      "channels": ["Watania 1", "beIN Sports Arabic"],
+      "primary": "Watania 1"
+    },
+    "NZL": {
+      "country": "New Zealand",
+      "channels": ["TVNZ", "Sky Sport"],
+      "primary": "Sky Sport"
+    },
+    "IRN": {
+      "country": "Iran",
+      "channels": ["IRIB", "Iran International"],
+      "primary": "IRIB"
+    },
+    "BEL": {
+      "country": "Belgium",
+      "channels": ["RTBF", "VRT", "Eleven Sports"],
+      "primary": "RTBF"
+    },
+    "EGY": {
+      "country": "Egypt",
+      "channels": ["ON TV", "beIN Sports Arabic"],
+      "primary": "ON TV"
+    },
+    "URU": {
+      "country": "Uruguay",
+      "channels": ["Antel TV", "Tenfield", "VTV"],
+      "primary": "Tenfield"
+    },
+    "KSA": {
+      "country": "Saudi Arabia",
+      "channels": ["beIN Sports", "SSC"],
+      "primary": "SSC"
+    },
+    "ESP": {
+      "country": "Spain",
+      "channels": ["La 1", "laSexta", "Movistar+"],
+      "primary": "La 1"
+    },
+    "CPV": {
+      "country": "Cape Verde",
+      "channels": ["TCV", "Tv+"],
+      "primary": "TCV"
+    },
+    "NOR": {
+      "country": "Norway",
+      "channels": ["NRK", "TV 2"],
+      "primary": "NRK"
+    },
+    "FRA": {
+      "country": "France",
+      "channels": ["TF1", "France 2", "France 3"],
+      "primary": "TF1"
+    },
+    "SEN": {
+      "country": "Senegal",
+      "channels": ["RTS", "SeneNews"],
+      "primary": "RTS"
+    },
+    "IRQ": {
+      "country": "Iraq",
+      "channels": ["IRAQIA", "beIN Sports Arabic"],
+      "primary": "IRAQIA"
+    },
+    "ARG": {
+      "country": "Argentina",
+      "channels": ["TyC Sports", "Canal 13"],
+      "primary": "TyC Sports"
+    },
+    "AUT": {
+      "country": "Austria",
+      "channels": ["ORF 1", "ORF 2"],
+      "primary": "ORF 1"
+    },
+    "JOR": {
+      "country": "Jordan",
+      "channels": ["beIN Sports", "Jordan TV"],
+      "primary": "beIN Sports"
+    },
+    "DZA": {
+      "country": "Algeria",
+      "channels": ["ENTV", "beIN Sports Arabic"],
+      "primary": "ENTV"
+    },
+    "COL": {
+      "country": "Colombia",
+      "channels": ["Caracol", "RCN", "Claro Sports"],
+      "primary": "Caracol"
+    },
+    "COD": {
+      "country": "DR Congo",
+      "channels": ["RTNC", "Canal+ Congo"],
+      "primary": "RTNC"
+    },
+    "POR": {
+      "country": "Portugal",
+      "channels": ["RTP 1", "SIC", "TVI"],
+      "primary": "RTP 1"
+    },
+    "UZB": {
+      "country": "Uzbekistan",
+      "channels": ["O'zbek Televisi", "First Channel"],
+      "primary": "O'zbek Televisi"
+    },
+    "ENG": {
+      "country": "England",
+      "channels": ["BBC", "ITV"],
+      "primary": "BBC"
+    },
+    "GHA": {
+      "country": "Ghana",
+      "channels": ["GTV", "StarTimes"],
+      "primary": "GTV"
+    },
+    "PAN": {
+      "country": "Panama",
+      "channels": ["TVN", "Visionnet"],
+      "primary": "TVN"
+    },
+    "CRO": {
+      "country": "Croatia",
+      "channels": ["HRT", "A1 TV"],
+      "primary": "HRT"
+    }
+  }
+}
