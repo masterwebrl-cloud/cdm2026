@@ -1,0 +1,6 @@
+User-agent: *
+Allow: /
+Disallow: /api/
+Disallow: /.netlify/
+
+Sitemap: https://wc2026app.netlify.app/sitemap.xml
