@@ -13,3 +13,9 @@
   from = "/api/chat"
   to = "/.netlify/functions/chat"
   status = 200
+
+# /api/news -> Netlify Function news (bandeau d'actualités défilant)
+[[redirects]]
+  from = "/api/news"
+  to = "/.netlify/functions/news"
+  status = 200
