@@ -7,7 +7,7 @@
 
 const BASE = "https://api.football-data.org/v4";
 let CACHE = { ts: 0, data: null };
-const CACHE_MS = 60 * 1000; // 60 s, pour rester loin de la limite 10 req/min
+const CACHE_MS = 15 * 1000; // 15 s — fraîcheur live (4 req/min max, limite API: 10/min)
 
 exports.handler = async function () {
   const token = process.env.FOOTBALL_DATA_TOKEN;
