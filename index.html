@@ -875,55 +875,17 @@ function probaMatch(a,b){
 }
 // ===============================================================================
 
-// Les 8 matchs où un 1er affronte un 3e (groupes fixes selon le format FIFA)
-// L'appariement avec le 3e se fait DYNAMIQUEMENT par rang :
-// meilleur 1er ↔ meilleur 3e, ..., pire 1er ↔ pire 3e
-const FIRST_VS_THIRD_SLOTS = [
-  {m:74, firstGroup:'E'},
-  {m:77, firstGroup:'I'},
-  {m:79, firstGroup:'A'},
-  {m:80, firstGroup:'L'},
-  {m:81, firstGroup:'D'},
-  {m:82, firstGroup:'G'},
-  {m:85, firstGroup:'B'},
-  {m:87, firstGroup:'K'}
-];
+// Les 16es de finale sont VERROUILLÉS après la phase de groupes.
+// Mapping officiel FIFA — Sources : FIFA.com, NBC Sports, Sky Sports, ESPN (28 juin 2026)
+const pos1=g=>grp[g]?grp[g][0]:null;
+const pos2=g=>grp[g]?grp[g][1]:null;
 const qualifiedThirdGroups = qualifiedThirds.map(t=>t.gr);
 const thirdByGroup={};qualifiedThirds.forEach(t=>thirdByGroup[t.gr]=t);
 
-// Apparier les 1ers (triés par force) aux 3es (triés par rang)
-// Contrainte : un 1er ne peut pas affronter un 3e de son propre groupe
-function assignThirds(){
-  const sortedSlots=[...FIRST_VS_THIRD_SLOTS].sort((a,b)=>{
-    const A=grp[a.firstGroup]?.[0], B=grp[b.firstGroup]?.[0];
-    if(!A||!B) return 0;
-    return B.pts-A.pts || B.gd-A.gd || B.gf-A.gf;
-  });
-  const result={}; const usedThirds=new Set();
-  // Backtracking : essaie d'apparier chaque slot (du meilleur 1er au pire) avec le meilleur 3e dispo
-  function solve(i){
-    if(i===sortedSlots.length) return true;
-    const slot=sortedSlots[i];
-    for(const t of qualifiedThirds){
-      if(usedThirds.has(t.gr)) continue;
-      if(t.gr===slot.firstGroup) continue; // pas de match interne
-      usedThirds.add(t.gr); result[slot.m]=t.gr;
-      if(solve(i+1)) return true;
-      usedThirds.delete(t.gr); delete result[slot.m];
-    }
-    return false;
-  }
-  solve(0);
-  return result;
-}
-const thirdAssign=assignThirds(); // matchNum -> groupe 3e
+// Récupération sécurisée d'une équipe par code (renvoie objet avec name + stats)
+const teamByCode = code => st[code] ? Object.assign({}, st[code], {name: cn(code), t: code}) : null;
 
-const pos1=g=>grp[g]?grp[g][0]:null;
-const pos2=g=>grp[g]?grp[g][1]:null;
-const posThirdM=mNum=>{const tg=thirdAssign[mNum];return tg?thirdByGroup[tg]:null;};
-const thirdLabel=mNum=>{const tg=thirdAssign[mNum];return tg?("3e "+tg):"3e";};
-
-// Horaires des 16es (heures de Paris) + ville. Sources : franceinfo, Eurosport, ICI.
+// Horaires des 16es (heures de Paris) + ville. Sources : FIFA, NBC.
 const R32_SCHED = {
   73:{d:"Dim 28/6", t:"21:00", city:"Los Angeles"},
   74:{d:"Lun 29/6", t:"22:30", city:"Boston"},
@@ -942,24 +904,48 @@ const R32_SCHED = {
   87:{d:"Ven 3/7", t:"03:30", city:"Kansas City"},
   88:{d:"Jeu 2/7", t:"21:00", city:"Dallas"}
 };
-// Définition des 16es — structure officielle FIFA exacte
+
+// ===============================================================================
+// MAPPING OFFICIEL FIFA — 16es de finale (verrouillé fin phase de groupes)
+// Sources : FIFA.com, NBC Sports, Sky Sports, ESPN, FOX (28 juin 2026)
+// ===============================================================================
+const R32_BRACKET = {
+  73: { a:'RSA', b:'CAN', la:'2e A',  lb:'2e B'  },  // South Africa vs Canada
+  74: { a:'GER', b:'PAR', la:'1er E', lb:'3e D'  },  // Germany vs Paraguay
+  75: { a:'NED', b:'MAR', la:'1er F', lb:'2e C'  },  // Netherlands vs Morocco
+  76: { a:'BRA', b:'JPN', la:'1er C', lb:'2e F'  },  // Brazil vs Japan
+  77: { a:'FRA', b:'SWE', la:'1er I', lb:'3e F'  },  // France vs Sweden
+  78: { a:'CIV', b:'NOR', la:'2e E',  lb:'2e I'  },  // Côte d'Ivoire vs Norway
+  79: { a:'MEX', b:'ECU', la:'1er A', lb:'3e E'  },  // Mexico vs Ecuador
+  80: { a:'ENG', b:'COD', la:'1er L', lb:'3e K'  },  // England vs DR Congo
+  81: { a:'USA', b:'BIH', la:'1er D', lb:'3e B'  },  // USA vs Bosnia
+  82: { a:'BEL', b:'SEN', la:'1er G', lb:'3e I'  },  // Belgium vs Senegal
+  83: { a:'POR', b:'CRO', la:'2e K',  lb:'2e L'  },  // Portugal vs Croatia
+  84: { a:'ESP', b:'AUT', la:'1er H', lb:'2e J'  },  // Spain vs Austria
+  85: { a:'SUI', b:'DZA', la:'1er B', lb:'3e J'  },  // Switzerland vs Algérie
+  86: { a:'ARG', b:'CPV', la:'1er J', lb:'2e H'  },  // Argentina vs Cap-Vert
+  87: { a:'COL', b:'GHA', la:'1er K', lb:'3e L'  },  // Colombia vs Ghana
+  88: { a:'AUS', b:'EGY', la:'2e D',  lb:'2e G'  }   // Australia vs Egypt
+};
+
+// Définition des 16es — ordre d'affichage gauche/droite du bracket
 const R32=[
-  {n:73,a:()=>pos2("A"),b:()=>pos2("B"),la:"2e A",lb:"2e B"},
-  {n:75,a:()=>pos1("F"),b:()=>pos2("C"),la:"1er F",lb:"2e C"},
-  {n:74,a:()=>pos1("E"),b:()=>posThirdM(74),la:"1er E",lb:thirdLabel(74)},
-  {n:77,a:()=>pos1("I"),b:()=>posThirdM(77),la:"1er I",lb:thirdLabel(77)},
-  {n:76,a:()=>pos1("C"),b:()=>pos2("F"),la:"1er C",lb:"2e F"},
-  {n:78,a:()=>pos2("E"),b:()=>pos2("I"),la:"2e E",lb:"2e I"},
-  {n:79,a:()=>pos1("A"),b:()=>posThirdM(79),la:"1er A",lb:thirdLabel(79)},
-  {n:80,a:()=>pos1("L"),b:()=>posThirdM(80),la:"1er L",lb:thirdLabel(80)},
-  {n:83,a:()=>pos2("K"),b:()=>pos2("L"),la:"2e K",lb:"2e L"},
-  {n:84,a:()=>pos1("H"),b:()=>pos2("J"),la:"1er H",lb:"2e J"},
-  {n:81,a:()=>pos1("D"),b:()=>posThirdM(81),la:"1er D",lb:thirdLabel(81)},
-  {n:82,a:()=>pos1("G"),b:()=>posThirdM(82),la:"1er G",lb:thirdLabel(82)},
-  {n:86,a:()=>pos1("J"),b:()=>pos2("H"),la:"1er J",lb:"2e H"},
-  {n:88,a:()=>pos2("D"),b:()=>pos2("G"),la:"2e D",lb:"2e G"},
-  {n:85,a:()=>pos1("B"),b:()=>posThirdM(85),la:"1er B",lb:thirdLabel(85)},
-  {n:87,a:()=>pos1("K"),b:()=>posThirdM(87),la:"1er K",lb:thirdLabel(87)}
+  {n:73,a:()=>teamByCode(R32_BRACKET[73].a),b:()=>teamByCode(R32_BRACKET[73].b),la:R32_BRACKET[73].la,lb:R32_BRACKET[73].lb},
+  {n:75,a:()=>teamByCode(R32_BRACKET[75].a),b:()=>teamByCode(R32_BRACKET[75].b),la:R32_BRACKET[75].la,lb:R32_BRACKET[75].lb},
+  {n:74,a:()=>teamByCode(R32_BRACKET[74].a),b:()=>teamByCode(R32_BRACKET[74].b),la:R32_BRACKET[74].la,lb:R32_BRACKET[74].lb},
+  {n:77,a:()=>teamByCode(R32_BRACKET[77].a),b:()=>teamByCode(R32_BRACKET[77].b),la:R32_BRACKET[77].la,lb:R32_BRACKET[77].lb},
+  {n:76,a:()=>teamByCode(R32_BRACKET[76].a),b:()=>teamByCode(R32_BRACKET[76].b),la:R32_BRACKET[76].la,lb:R32_BRACKET[76].lb},
+  {n:78,a:()=>teamByCode(R32_BRACKET[78].a),b:()=>teamByCode(R32_BRACKET[78].b),la:R32_BRACKET[78].la,lb:R32_BRACKET[78].lb},
+  {n:79,a:()=>teamByCode(R32_BRACKET[79].a),b:()=>teamByCode(R32_BRACKET[79].b),la:R32_BRACKET[79].la,lb:R32_BRACKET[79].lb},
+  {n:80,a:()=>teamByCode(R32_BRACKET[80].a),b:()=>teamByCode(R32_BRACKET[80].b),la:R32_BRACKET[80].la,lb:R32_BRACKET[80].lb},
+  {n:83,a:()=>teamByCode(R32_BRACKET[83].a),b:()=>teamByCode(R32_BRACKET[83].b),la:R32_BRACKET[83].la,lb:R32_BRACKET[83].lb},
+  {n:84,a:()=>teamByCode(R32_BRACKET[84].a),b:()=>teamByCode(R32_BRACKET[84].b),la:R32_BRACKET[84].la,lb:R32_BRACKET[84].lb},
+  {n:81,a:()=>teamByCode(R32_BRACKET[81].a),b:()=>teamByCode(R32_BRACKET[81].b),la:R32_BRACKET[81].la,lb:R32_BRACKET[81].lb},
+  {n:82,a:()=>teamByCode(R32_BRACKET[82].a),b:()=>teamByCode(R32_BRACKET[82].b),la:R32_BRACKET[82].la,lb:R32_BRACKET[82].lb},
+  {n:86,a:()=>teamByCode(R32_BRACKET[86].a),b:()=>teamByCode(R32_BRACKET[86].b),la:R32_BRACKET[86].la,lb:R32_BRACKET[86].lb},
+  {n:88,a:()=>teamByCode(R32_BRACKET[88].a),b:()=>teamByCode(R32_BRACKET[88].b),la:R32_BRACKET[88].la,lb:R32_BRACKET[88].lb},
+  {n:85,a:()=>teamByCode(R32_BRACKET[85].a),b:()=>teamByCode(R32_BRACKET[85].b),la:R32_BRACKET[85].la,lb:R32_BRACKET[85].lb},
+  {n:87,a:()=>teamByCode(R32_BRACKET[87].a),b:()=>teamByCode(R32_BRACKET[87].b),la:R32_BRACKET[87].la,lb:R32_BRACKET[87].lb}
 ];
 // Résolution des équipes (16es) — projection à partir des classements actuels
 const win={};   // matchNum -> team projetée vainqueur (UNIQUEMENT si le match est réellement joué)
