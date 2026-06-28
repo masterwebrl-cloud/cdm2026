@@ -677,7 +677,7 @@ let broadcasters = {};  // données des diffuseurs par pays {MEX: {primary:'TUDN
 async function tryLive(){
   try{
     const ctrl=new AbortController(); const to=setTimeout(()=>ctrl.abort(),6000);
-    const r=await fetch('/api/scores',{signal:ctrl.signal}); clearTimeout(to);
+    const r=await fetch('/api/scores?_t='+Date.now(),{signal:ctrl.signal, cache:'no-store', headers:{'Cache-Control':'no-cache','Pragma':'no-cache'}}); clearTimeout(to);
     if(!r.ok) return false;
     const d=await r.json();
     if(d.error || !Array.isArray(d.fixtures)) return false;
@@ -1193,7 +1193,7 @@ function refreshLive(){
       if(b) b.textContent = liveGames.length ? (ui('live_data')+' — '+liveGames.length+' '+ui('live_count')) : ui('live_data');
     }
     // Re-sonder : toutes les 60 s s'il y a du live, sinon toutes les 5 min
-    const next = (liveGames && liveGames.length) ? 60000 : 300000;
+    const next = (liveGames && liveGames.length) ? 25000 : 300000;
     setTimeout(refreshLive, next);
   });
 }
