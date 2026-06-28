@@ -6,11 +6,17 @@
 
 <!-- SEO -->
 <meta name="description" content="Dashboard officieux de la Coupe du Monde FIFA 2026 : classements en direct, diffusion du jour (FR/MAR), projection du bracket, chat supporters. 9 langues.">
-<meta name="keywords" content="Coupe du Monde 2026, FIFA, classements, bracket, 16es de finale, projection, chat, supporters, Mondial, World Cup">
+<meta name="keywords" content="Coupe du Monde 2026, FIFA World Cup 2026, Mondial 2026, classements, bracket, 16es de finale, projection, chat supporters, Canada Mexique USA, Mexique, Corée du Sud, Tchéquie, Afrique du Sud, Canada, Suisse, Bosnie-Herzégovine, Qatar, Brésil, Maroc, Écosse, Haïti, États-Unis, Australie, Paraguay, Turquie, Allemagne, Côte d'Ivoire, Équateur, Curaçao, Pays-Bas, Suède, Japon, Tunisie, Nouvelle-Zélande, Iran, Belgique, Égypte, Uruguay, Arabie Saoudite, Espagne, Cap-Vert, Norvège, France, Sénégal, Iraq, Argentine, Autriche, Jordanie, Algérie, Colombie, RD Congo, Portugal, Ouzbékistan, Angleterre, Ghana, Panama, Croatie, UEFA, CAF, AFC, CONMEBOL, CONCACAF, OFC, football, soccer, Mbappé, Ronaldo, Messi, Haaland, Bellingham, Hakimi, Salah">
 <meta name="author" content="wc2026app">
-<meta name="robots" content="index, follow">
+<meta name="robots" content="index, follow, max-image-preview:large">
 <link rel="canonical" href="https://wc2026app.netlify.app/">
 <meta name="theme-color" content="#0a0a0a">
+
+<!-- Performance : préconnexion aux domaines tiers critiques -->
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="dns-prefetch" href="https://cloud.umami.is">
+<link rel="dns-prefetch" href="https://www.paypalobjects.com">
 
 <!-- Open Graph (Facebook, LinkedIn, WhatsApp) -->
 <meta property="og:type" content="website">
@@ -21,6 +27,7 @@
 <meta property="og:image" content="https://wc2026app.netlify.app/og-image.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Coupe du Monde 2026 — 48 nations qualifiées">
 <meta property="og:locale" content="fr_FR">
 <meta property="og:locale:alternate" content="en_US">
 <meta property="og:locale:alternate" content="ar_AR">
@@ -33,6 +40,7 @@
 <meta name="twitter:title" content="Coupe du Monde 2026 — Classements & Bracket en direct">
 <meta name="twitter:description" content="Classements en direct, projection du bracket, diffusion TV du jour. 9 langues. Chat supporters modéré.">
 <meta name="twitter:image" content="https://wc2026app.netlify.app/og-image.png">
+<meta name="twitter:image:alt" content="Coupe du Monde 2026 — 48 nations qualifiées">
 
 <!-- Schema.org structured data -->
 <script type="application/ld+json">
@@ -40,11 +48,13 @@
   "@context": "https://schema.org",
   "@type": "SportsEvent",
   "name": "FIFA World Cup 2026",
+  "alternateName": ["Coupe du Monde 2026", "Mondial 2026", "World Cup 2026", "Mundial 2026", "WM 2026"],
   "description": "Coupe du Monde FIFA 2026 — 48 équipes, 12 groupes, 104 matchs",
   "startDate": "2026-06-11",
   "endDate": "2026-07-19",
   "sport": "Soccer",
   "url": "https://wc2026app.netlify.app/",
+  "image": "https://wc2026app.netlify.app/og-image.png",
   "location": [
     {"@type": "Country", "name": "Canada"},
     {"@type": "Country", "name": "Mexico"},

@@ -1,0 +1,31 @@
+# Netlify headers — cache CDN agressif pour boost Lighthouse Performance
+
+/*
+  X-Content-Type-Options: nosniff
+  X-Frame-Options: SAMEORIGIN
+  Referrer-Policy: strict-origin-when-cross-origin
+  Permissions-Policy: geolocation=(), camera=(), microphone=()
+
+/index.html
+  Cache-Control: public, max-age=300, must-revalidate
+
+/og-image.png
+  Cache-Control: public, max-age=86400, immutable
+
+/sitemap.xml
+  Cache-Control: public, max-age=3600
+
+/robots.txt
+  Cache-Control: public, max-age=86400
+
+/api/news
+  Cache-Control: public, max-age=300, s-maxage=300
+
+/api/scores
+  Cache-Control: public, max-age=30, s-maxage=30
+
+/*.css
+  Cache-Control: public, max-age=31536000, immutable
+
+/*.js
+  Cache-Control: public, max-age=31536000, immutable
