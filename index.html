@@ -545,13 +545,7 @@ function updateUI(){
   document.getElementById('live-title').textContent = t('live_title');
   document.getElementById('live-tag').textContent = t('live_tag');
   
-  document.getElementById('groups-title').textContent = t('groups_title');
-  document.getElementById('groups-tag').textContent = t('groups_tag');
-  
   document.getElementById('tv-title').textContent = t('tv_title');
-  
-  document.getElementById('thirds-title').innerHTML = t('thirds_title');
-  document.getElementById('thirds-tag').textContent = t('thirds_tag');
   
   document.getElementById('bracket-title').innerHTML = t('bracket_title');
   document.getElementById('bracket-tag').textContent = t('bracket_tag');
@@ -765,7 +759,6 @@ function clearAll(){ ['tv','bracket','bracket-linear','matches','live','confed-g
 
 function renderAll(){
 clearAll();
-koWinnerCache = {};  // reset cache à chaque render (recalcul depuis API fraîche)
 
 // ---- MATCHS EN DIRECT (affichage seul, non compté au classement) ----
 (function(){
