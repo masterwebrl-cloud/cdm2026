@@ -884,8 +884,29 @@ te.innerHTML=`<table><thead><tr><th></th><th class="l">${ui('team')}</th><th>${u
   renderPlayerList($scorers, TOP_SCORERS, 'g', ui('stats_goals_label')||'buts · phase de groupes');
   renderPlayerList($assists, TOP_ASSISTS, 'a', ui('stats_assists_label')||'passes décisives');
   
-  // === MEILLEURES ATTAQUES (calculé depuis st live) ===
-  const allTeams = Object.values(st).filter(t => t.played > 0);
+  // === MEILLEURES ATTAQUES / DÉFENSES ===
+  // Recalcul complet depuis allFixtures pour inclure TOUS les matchs joués (groupes + KO)
+  const totalStats = {};
+  if(Array.isArray(allFixtures)) {
+    allFixtures.forEach(f => {
+      if(f.status !== 'FINISHED') return;
+      const hc = tlaCode(f.homeTla), ac = tlaCode(f.awayTla);
+      if(!hc || !ac || f.homeGoals == null || f.awayGoals == null) return;
+      if(!totalStats[hc]) totalStats[hc] = {t:hc, played:0, gf:0, ga:0};
+      if(!totalStats[ac]) totalStats[ac] = {t:ac, played:0, gf:0, ga:0};
+      totalStats[hc].played++;
+      totalStats[ac].played++;
+      totalStats[hc].gf += f.homeGoals;
+      totalStats[hc].ga += f.awayGoals;
+      totalStats[ac].gf += f.awayGoals;
+      totalStats[ac].ga += f.homeGoals;
+    });
+  }
+  // Fallback sur st si allFixtures est vide (données figées de démarrage)
+  const allTeams = Object.values(totalStats).length 
+    ? Object.values(totalStats).filter(t => t.played > 0)
+    : Object.values(st).filter(t => t.played > 0);
+  
   const topAttack = [...allTeams]
     .sort((a,b) => b.gf - a.gf || (b.gf/Math.max(1,b.played)) - (a.gf/Math.max(1,a.played)))
     .slice(0, 8);
@@ -898,13 +919,12 @@ te.innerHTML=`<table><thead><tr><th></th><th class="l">${ui('team')}</th><th>${u
       + '<span class="stats-team">'
       +   flagImg(t.t, 16)
       +   '<span class="name">'+cn(t.t)+'</span>'
-      +   '<span class="country">'+avgPerGame+'/m</span>'
+      +   '<span class="country">'+avgPerGame+'/m · '+t.played+'j</span>'
       + '</span>'
       + '<span class="stats-value">'+t.gf+'</span>'
       + '</div>';
-  }).join('') + '<div class="stats-meta">'+(ui('stats_attack_label')||'buts marqués · '+(allTeams[0]?.played||3)+' matchs')+'</div>';
+  }).join('') + '<div class="stats-meta">'+(ui('stats_attack_label')||'buts marqués (tous matchs)')+'</div>';
   
-  // === MEILLEURES DÉFENSES ===
   const topDefense = [...allTeams]
     .sort((a,b) => a.ga - b.ga || (a.ga/Math.max(1,a.played)) - (b.ga/Math.max(1,b.played)))
     .slice(0, 8);
@@ -917,11 +937,11 @@ te.innerHTML=`<table><thead><tr><th></th><th class="l">${ui('team')}</th><th>${u
       + '<span class="stats-team">'
       +   flagImg(t.t, 16)
       +   '<span class="name">'+cn(t.t)+'</span>'
-      +   '<span class="country">'+avgPerGame+'/m</span>'
+      +   '<span class="country">'+avgPerGame+'/m · '+t.played+'j</span>'
       + '</span>'
       + '<span class="stats-value">'+t.ga+'</span>'
       + '</div>';
-  }).join('') + '<div class="stats-meta">'+(ui('stats_defense_label')||'buts encaissés')+'</div>';
+  }).join('') + '<div class="stats-meta">'+(ui('stats_defense_label')||'buts encaissés (tous matchs)')+'</div>';
 })();
 
 // ---- QUALIFIÉS PAR CONFÉDÉRATION ----
@@ -1151,32 +1171,40 @@ function winnerCodeFromMatch(f){
   return null;
 }
 
-// Vainqueur réel d'un match KO (récursif, propagation depuis API)
-// Renvoie null si le match n'est pas encore joué OU si les nourriciers ne sont pas connus.
+// Vainqueur réel ou projeté d'un match KO (récursif, propagation depuis API)
+// Retourne un objet équipe enrichi d'un flag .projected = true si c'est une projection
 function koWinner(matchNum){
   if(matchNum in koWinnerCache) return koWinnerCache[matchNum];
-  let codeA, codeB;
+  let teamA, teamB;
   if(R32_BRACKET[matchNum]){
-    // R32 : équipes en dur depuis le mapping FIFA
-    codeA = R32_BRACKET[matchNum].a;
-    codeB = R32_BRACKET[matchNum].b;
+    teamA = teamByCode(R32_BRACKET[matchNum].a);
+    teamB = teamByCode(R32_BRACKET[matchNum].b);
   } else if(KO_FEEDERS[matchNum]){
-    // R16+ : récupération récursive des vainqueurs des matchs précédents
     const [fx, fy] = KO_FEEDERS[matchNum];
-    const wA = koWinner(fx);
-    const wB = koWinner(fy);
-    if(!wA || !wB){ koWinnerCache[matchNum] = null; return null; }
-    codeA = wA.t; codeB = wB.t;
+    teamA = koWinner(fx);
+    teamB = koWinner(fy);
+    if(!teamA || !teamB){ koWinnerCache[matchNum] = null; return null; }
   } else {
     koWinnerCache[matchNum] = null;
     return null;
   }
-  // Chercher si le match (entre ces 2 équipes) a été joué
-  const f = findKoMatchByTeams(codeA, codeB);
+  // 1. Si le match est réellement joué → vrai vainqueur (flag projected=false)
+  const f = findKoMatchByTeams(teamA.t, teamB.t);
   const winnerCode = winnerCodeFromMatch(f);
-  const result = winnerCode ? teamByCode(winnerCode) : null;
-  koWinnerCache[matchNum] = result;
-  return result;
+  if(winnerCode){
+    const result = Object.assign({}, teamByCode(winnerCode), {projected:false, played:true});
+    koWinnerCache[matchNum] = result;
+    return result;
+  }
+  // 2. Sinon, projection : favori selon better()
+  const projected = better(teamA, teamB);
+  if(projected){
+    const result = Object.assign({}, projected, {projected:true, played:false});
+    koWinnerCache[matchNum] = result;
+    return result;
+  }
+  koWinnerCache[matchNum] = null;
+  return null;
 }
 
 // Tours suivants : on ne remplit un match QUE si ses deux nourriciers sont réellement joués.
