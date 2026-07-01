@@ -1173,35 +1173,31 @@ function winnerCodeFromMatch(f){
   return null;
 }
 
-// Vainqueur réel ou projeté d'un match KO (récursif, propagation depuis API)
-// Retourne un objet équipe enrichi d'un flag .projected = true si c'est une projection
+// Vainqueur RÉEL d'un match KO (récursif, propagation depuis API football-data.org)
+// Retourne null si le match n'est pas encore joué → le rendu affichera "Vainqueur MXX"
 function koWinner(matchNum){
   if(matchNum in koWinnerCache) return koWinnerCache[matchNum];
-  let teamA, teamB;
+  let codeA, codeB;
   if(R32_BRACKET[matchNum]){
-    teamA = teamByCode(R32_BRACKET[matchNum].a);
-    teamB = teamByCode(R32_BRACKET[matchNum].b);
+    // R32 : équipes en dur depuis le mapping FIFA
+    codeA = R32_BRACKET[matchNum].a;
+    codeB = R32_BRACKET[matchNum].b;
   } else if(KO_FEEDERS[matchNum]){
+    // R16+ : besoin des VRAIS vainqueurs des nourriciers (pas de projection)
     const [fx, fy] = KO_FEEDERS[matchNum];
-    teamA = koWinner(fx);
-    teamB = koWinner(fy);
-    if(!teamA || !teamB){ koWinnerCache[matchNum] = null; return null; }
+    const wA = koWinner(fx);
+    const wB = koWinner(fy);
+    if(!wA || !wB){ koWinnerCache[matchNum] = null; return null; }
+    codeA = wA.t; codeB = wB.t;
   } else {
     koWinnerCache[matchNum] = null;
     return null;
   }
-  // 1. Si le match est réellement joué → vrai vainqueur (flag projected=false)
-  const f = findKoMatchByTeams(teamA.t, teamB.t);
+  // Chercher le match dans allFixtures (uniquement FINISHED)
+  const f = findKoMatchByTeams(codeA, codeB);
   const winnerCode = winnerCodeFromMatch(f);
   if(winnerCode){
-    const result = Object.assign({}, teamByCode(winnerCode), {projected:false, played:true});
-    koWinnerCache[matchNum] = result;
-    return result;
-  }
-  // 2. Sinon, projection : favori selon better()
-  const projected = better(teamA, teamB);
-  if(projected){
-    const result = Object.assign({}, projected, {projected:true, played:false});
+    const result = Object.assign({}, teamByCode(winnerCode), {played:true, projected:false});
     koWinnerCache[matchNum] = result;
     return result;
   }
@@ -1242,21 +1238,18 @@ function teamRow(team,label,isWin,pct){
 }
 function tieBox(m,labelA,labelB,extra){
   const isR32 = !!R32_SCHED[m.n];
-  // Pour les 16es on utilise la projection ; pour les tours suivants, m.tA/m.tB (réels ou projetés)
+  // Pour les 16es on charge les équipes en dur ; pour les tours suivants, m.tA/m.tB (réels ou null)
   if(isR32){ m.tA = m.a ? m.a() : m.tA; m.tB = m.b ? m.b() : m.tB; }
-  // Vrai vainqueur = équipe koWinner avec projected:false (match FINISHED dans l'API)
-  // Projection = équipe koWinner avec projected:true (favori calculé)
-  const koRes = koWinner(m.n);
-  const realWinner = (koRes && koRes.played === true) ? koRes : null;
-  const projWinner = (koRes && koRes.projected === true) ? koRes : null;
-  const winner = realWinner || projWinner || (isR32 ? proj[m.n] : null);
+  // Vainqueur uniquement si le match est réellement joué (via API) — pas de projection fictive
+  const realWinner = koWinner(m.n);
+  const winner = realWinner;
   const wA=winner&&m.tA&&winner.t===m.tA.t;
   const wB=winner&&m.tB&&winner.t===m.tB.t;
   const s=R32_SCHED[m.n];
   const probs = probaMatch(m.tA,m.tB);
   const pA = probs? probs[0] : null;
   const pB = probs? probs[1] : null;
-  // Badge : "Joué ✓" uniquement si vrai résultat depuis l'API ; sinon "Validé" ou date
+  // Badge : "Joué ✓" uniquement si vrai résultat depuis l'API
   const playedBadge = realWinner ? '<span class="valid" style="background:rgba(80,200,120,.15);color:#7fd99a;">✓ Joué</span>' : '';
   const valid = playedBadge || ((s && tieValidated(m)) ? '<span class="valid">'+ui('validated')+'</span>' : '');
   const headLeft = s ? ('M'+m.n+' · '+s.city) : ('M'+m.n);
