@@ -835,33 +835,35 @@ te.innerHTML=`<table><thead><tr><th></th><th class="l">${ui('team')}</th><th>${u
   const $defense = document.getElementById('stats-defense');
   if(!$scorers || !$assists || !$attack || !$defense) return;
   
-  // === TOP BUTEURS (en dur, mis à jour manuellement après chaque round) ===
-  // Sources : FIFA.com, Yahoo Sports, NBC, Goal.com — 28 juin 2026
+  // === TOP BUTEURS (Sources : FIFA.com, Yahoo, NBC, Goal.com, Sky — 1er juillet 2026, R32 en cours) ===
+  // FIFA départage à égalité par : (1) assists, (2) minutes jouées croissant
   const TOP_SCORERS = [
-    { n:'Lionel Messi',       c:'ARG', g:5 },
-    { n:'Kylian Mbappé',      c:'FRA', g:4 },
-    { n:'Erling Haaland',     c:'NOR', g:4 },
+    { n:'Kylian Mbappé',      c:'FRA', g:6 },  // brace vs Suède R32 + brace Sénégal + brace Iraq (leader via 2 assists)
+    { n:'Lionel Messi',       c:'ARG', g:6 },  // hat-trick vs Algérie + brace vs Autriche + coup franc vs Norvège
+    { n:'Erling Haaland',     c:'NOR', g:5 },  // 2 vs Iraq + 2 vs Sénégal + 1 vs Côte d\'Ivoire (R32)
+    { n:'Ousmane Dembélé',    c:'FRA', g:4 },  // hat-trick vs Norvège + 1 groupe
     { n:'Vinícius Júnior',    c:'BRA', g:4 },
-    { n:'Ousmane Dembélé',    c:'FRA', g:3 },
-    { n:'Deniz Undav',        c:'GER', g:3 },
-    { n:'Jonathan David',     c:'CAN', g:3 },
+    { n:'Ismaila Sarr',       c:'SEN', g:3 },
+    { n:'Julián Quiñones',    c:'MEX', g:3 },  // 2 en groupes + 1 vs Équateur R32
+    { n:'Matheus Cunha',      c:'BRA', g:3 },
+    { n:'Harry Kane',         c:'ENG', g:3 },
+    { n:'Jonathan David',     c:'CAN', g:3 },  // hat-trick vs Qatar
     { n:'Ismael Saibari',     c:'MAR', g:3 },
-    { n:'Harry Kane',         c:'ENG', g:2 },
-    { n:'Brian Brobbey',      c:'NED', g:2 }
+    { n:'Yoane Wissa',        c:'COD', g:3 }
   ];
   
-  // === TOP PASSEURS (Source : Sofascore, 28 juin 2026) ===
+  // === TOP PASSEURS (Sources : FIFA, Yahoo Sports, Sofascore — 1er juillet 2026) ===
   const TOP_ASSISTS = [
-    { n:'Alexander Isak',     c:'SWE', a:2 },
-    { n:'Deniz Undav',        c:'GER', a:2 },
-    { n:'Joshua Kimmich',     c:'GER', a:2 },
-    { n:'Julio Enciso',       c:'PAR', a:2 },
-    { n:'Christian Pulisic',  c:'USA', a:2 },
+    { n:'Kylian Mbappé',      c:'FRA', a:3 },  // 2 assists R32 vs Suède (Yahoo)
     { n:'Bruno Fernandes',    c:'POR', a:2 },
-    { n:'Ryan Gravenberch',   c:'NED', a:2 },
+    { n:'Joshua Kimmich',     c:'GER', a:2 },
+    { n:'Alexander Isak',     c:'SWE', a:2 },
+    { n:'Christian Pulisic',  c:'USA', a:2 },
     { n:'Brahim Díaz',        c:'MAR', a:2 },
-    { n:'Chris Wood',         c:'NZL', a:2 },
-    { n:'Lionel Messi',       c:'ARG', a:1 }
+    { n:'Julio Enciso',       c:'PAR', a:2 },
+    { n:'Ryan Gravenberch',   c:'NED', a:2 },
+    { n:'Florian Wirtz',      c:'GER', a:2 },
+    { n:'Vinícius Júnior',    c:'BRA', a:2 }
   ];
   
   // Fonction de rendu pour buteurs/passeurs
@@ -1240,20 +1242,22 @@ function teamRow(team,label,isWin,pct){
 }
 function tieBox(m,labelA,labelB,extra){
   const isR32 = !!R32_SCHED[m.n];
-  // Pour les 16es on utilise la projection ; pour les tours suivants, m.tA/m.tB (réels ou null)
+  // Pour les 16es on utilise la projection ; pour les tours suivants, m.tA/m.tB (réels ou projetés)
   if(isR32){ m.tA = m.a ? m.a() : m.tA; m.tB = m.b ? m.b() : m.tB; }
-  // Vrai vainqueur du match s'il est joué (sinon projection pour les R32)
-  const realWinner = koWinner(m.n);
-  const winner = realWinner || (isR32 ? proj[m.n] : null);
+  // Vrai vainqueur = équipe koWinner avec projected:false (match FINISHED dans l'API)
+  // Projection = équipe koWinner avec projected:true (favori calculé)
+  const koRes = koWinner(m.n);
+  const realWinner = (koRes && koRes.played === true) ? koRes : null;
+  const projWinner = (koRes && koRes.projected === true) ? koRes : null;
+  const winner = realWinner || projWinner || (isR32 ? proj[m.n] : null);
   const wA=winner&&m.tA&&winner.t===m.tA.t;
   const wB=winner&&m.tB&&winner.t===m.tB.t;
   const s=R32_SCHED[m.n];
   const probs = probaMatch(m.tA,m.tB);
   const pA = probs? probs[0] : null;
   const pB = probs? probs[1] : null;
-  // Badge "Joué ✓" si match terminé, sinon "Validated" si confirmé, sinon date
-  const isPlayed = !!realWinner;
-  const playedBadge = isPlayed ? '<span class="valid" style="background:rgba(80,200,120,.15);color:#7fd99a;">✓ Joué</span>' : '';
+  // Badge : "Joué ✓" uniquement si vrai résultat depuis l'API ; sinon "Validé" ou date
+  const playedBadge = realWinner ? '<span class="valid" style="background:rgba(80,200,120,.15);color:#7fd99a;">✓ Joué</span>' : '';
   const valid = playedBadge || ((s && tieValidated(m)) ? '<span class="valid">'+ui('validated')+'</span>' : '');
   const headLeft = s ? ('M'+m.n+' · '+s.city) : ('M'+m.n);
   const headRight = valid || (s? '<span class="seedlbl">'+s.d+'</span>' : '');
